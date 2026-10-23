@@ -1,0 +1,39 @@
+{
+  "n_reports_scored": 60,
+  "overall": {
+    "evidence_fidelity": 1.97,
+    "specificity": 0.85,
+    "uncertainty_calibration": 1.52
+  },
+  "by_doc_version": {
+    "new": {
+      "evidence_fidelity": 1.97,
+      "specificity": 0.77,
+      "uncertainty_calibration": 1.7
+    },
+    "old": {
+      "evidence_fidelity": 1.97,
+      "specificity": 0.93,
+      "uncertainty_calibration": 1.33
+    }
+  },
+  "by_finding": {
+    "inconclusive": {
+      "evidence_fidelity": 2.0,
+      "specificity": 0.93,
+      "uncertainty_calibration": 1.29
+    },
+    "no_obvious_drift": {
+      "evidence_fidelity": 1.93,
+      "specificity": 0.87,
+      "uncertainty_calibration": 1.7
+    },
+    "potential_drift": {
+      "evidence_fidelity": 2.0,
+      "specificity": 0.75,
+      "uncertainty_calibration": 1.38
+    }
+  },
+  "needs_update_yes_rate_old": 0.6,
+  "needs_update_yes_rate_new": 0.0
+}

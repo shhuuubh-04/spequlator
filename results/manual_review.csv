@@ -1,61 +1,61 @@
 n,record_id,project,function,doc_version,finding,summary,evidence_fidelity,specificity,uncertainty_calibration,needs_update,notes
-1,3cdb66d5ceb5,quantopian/zipline,Factor.winsorize,old,potential_drift,"The documentation describes parameter(s) `inclusive`, `limits` that the current code does not have.",,,,,
-1,3cdb66d5ceb5,quantopian/zipline,Factor.winsorize,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-2,a0595217ed39,LmeSzinc/AzurLaneAutoScript,Button.load_color,old,potential_drift,The documentation matches the old code better than the new code.,,,,,
-2,a0595217ed39,LmeSzinc/AzurLaneAutoScript,Button.load_color,new,potential_drift,The documentation matches the old code better than the new code.,,,,,
-3,f7d0a6abdd9f,tornadoweb/tornado,HTTPServer.start,old,potential_drift,The documentation matches the old code better than the new code.,,,,,
-3,f7d0a6abdd9f,tornadoweb/tornado,HTTPServer.start,new,potential_drift,The documentation matches the old code better than the new code.,,,,,
-4,fcf40a99b17f,tornadoweb/tornado,parse_qs_bytes,old,potential_drift,The documentation matches the old code better than the new code.,,,,,
-4,fcf40a99b17f,tornadoweb/tornado,parse_qs_bytes,new,potential_drift,The documentation matches the old code better than the new code.,,,,,
-5,35950e497c3a,locustio/locust,StatsEntry.extend,old,potential_drift,"The documentation mentions `add`, `full`, `history`, `seconds`, which this change removed from the code.",,,,,
-5,35950e497c3a,locustio/locust,StatsEntry.extend,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-6,6ff2d3fcfce4,pytorch/pytorch,ModuleList.extend,old,potential_drift,The documentation matches the old code better than the new code.,,,,,
-6,6ff2d3fcfce4,pytorch/pytorch,ModuleList.extend,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-7,cea215b339d0,zulip/zulip,GetSubscribersTest.check_well_formed_result,old,potential_drift,"The documentation mentions `email`, which this change removed from the code.",,,,,
-7,cea215b339d0,zulip/zulip,GetSubscribersTest.check_well_formed_result,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-8,f257fe21ffa4,Textualize/textual,ProgressBar.update,old,potential_drift,The documentation matches the old code better than the new code.,,,,,
-8,f257fe21ffa4,Textualize/textual,ProgressBar.update,new,potential_drift,The documentation matches the old code better than the new code.,,,,,
-9,d8d5e14a548b,mvt-project/mvt,DownloadAPKs.__init__,old,potential_drift,The documentation describes parameter(s) `output_folder` that the current code does not have.,,,,,
-9,d8d5e14a548b,mvt-project/mvt,DownloadAPKs.__init__,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-10,77c4f8608eb2,espnet/espnet,CustomConverter.__call__,old,potential_drift,The documentation matches the old code better than the new code.,,,,,
-10,77c4f8608eb2,espnet/espnet,CustomConverter.__call__,new,potential_drift,The documentation matches the old code better than the new code.,,,,,
-11,031ecf76a550,huggingface/transformers,window_reverse,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-11,031ecf76a550,huggingface/transformers,window_reverse,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-12,daf5fa9f64fd,matplotlib/matplotlib,Axes.axline,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-12,daf5fa9f64fd,matplotlib/matplotlib,Axes.axline,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-13,1e0c7304534a,pandas-dev/pandas,ExtensionDtype.construct_from_string,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-13,1e0c7304534a,pandas-dev/pandas,ExtensionDtype.construct_from_string,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-14,27160876c7dc,SAML-Toolkits/python3-saml,OneLogin_Saml2_Metadata.add_x509_key_descriptors,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-14,27160876c7dc,SAML-Toolkits/python3-saml,OneLogin_Saml2_Metadata.add_x509_key_descriptors,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-15,67999c454f6b,byt3bl33d3r/CrackMapExec,CMEModule.options,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-15,67999c454f6b,byt3bl33d3r/CrackMapExec,CMEModule.options,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-16,247af111e091,pandas-dev/pandas,OpenpyxlReader.__init__,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-16,247af111e091,pandas-dev/pandas,OpenpyxlReader.__init__,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-17,9aa2422d8e9c,PostHog/posthog,retrieve_entity_from,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-17,9aa2422d8e9c,PostHog/posthog,retrieve_entity_from,new,inconclusive,"The comparison signals disagree, so no finding is made.",,,,,
-18,050a32902702,google-research/text-to-text-transfer-transformer,Feature.__init__,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-18,050a32902702,google-research/text-to-text-transfer-transformer,Feature.__init__,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-19,f479be4d1896,matplotlib/matplotlib,ColorbarBase._mesh,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-19,f479be4d1896,matplotlib/matplotlib,ColorbarBase._mesh,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-20,a8b4f7d96e25,pandas-dev/pandas,Series.to_dict,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-20,a8b4f7d96e25,pandas-dev/pandas,Series.to_dict,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-21,cfa79d289e47,espnet/espnet,ESPnetEnhancementModel._compute_loss,old,inconclusive,The change does not clearly move the documentation's fit either way.,,,,,
-21,cfa79d289e47,espnet/espnet,ESPnetEnhancementModel._compute_loss,new,inconclusive,The change does not clearly move the documentation's fit either way.,,,,,
-22,64e68c17577e,matplotlib/matplotlib,YAxis._update_label_postion,old,inconclusive,The change does not clearly move the documentation's fit either way.,,,,,
-22,64e68c17577e,matplotlib/matplotlib,YAxis._update_label_postion,new,inconclusive,The change does not clearly move the documentation's fit either way.,,,,,
-23,4252ec47349d,stratosphereips/StratosphereLinuxIPS,Main.close_all_ports,old,inconclusive,The change does not clearly move the documentation's fit either way.,,,,,
-23,4252ec47349d,stratosphereips/StratosphereLinuxIPS,Main.close_all_ports,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-24,7ebf17aa6bf3,pandas-dev/pandas,DatetimeIndex.to_series,old,inconclusive,"The comparison signals disagree, so no finding is made.",,,,,
-24,7ebf17aa6bf3,pandas-dev/pandas,DatetimeIndex.to_series,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-25,50bb77bfd493,stratosphereips/StratosphereLinuxIPS,Main.update_host_ip,old,inconclusive,"The comparison signals disagree, so no finding is made.",,,,,
-25,50bb77bfd493,stratosphereips/StratosphereLinuxIPS,Main.update_host_ip,new,inconclusive,"The comparison signals disagree, so no finding is made.",,,,,
-26,6d79fa104be7,tornadoweb/tornado,RequestHandler.set_cookie,old,inconclusive,The change does not clearly move the documentation's fit either way.,,,,,
-26,6d79fa104be7,tornadoweb/tornado,RequestHandler.set_cookie,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-27,718273ac5378,pyg-team/pytorch_geometric,Aggregation.forward,old,inconclusive,"The comparison signals disagree, so no finding is made.",,,,,
-27,718273ac5378,pyg-team/pytorch_geometric,Aggregation.forward,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-28,f93fb84e2371,cupy/cupy,contraction,old,inconclusive,The change does not clearly move the documentation's fit either way.,,,,,
-28,f93fb84e2371,cupy/cupy,contraction,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
-29,78e30efa60ba,zulip/zulip,StreamAdminTest.test_delete_streams_youre_not_on,old,inconclusive,"The comparison signals disagree, so no finding is made.",,,,,
-29,78e30efa60ba,zulip/zulip,StreamAdminTest.test_delete_streams_youre_not_on,new,potential_drift,The documentation matches the old code better than the new code.,,,,,
-30,e6510d4afe27,pandas-dev/pandas,na_arithmetic_op,old,inconclusive,"The comparison signals disagree, so no finding is made.",,,,,
-30,e6510d4afe27,pandas-dev/pandas,na_arithmetic_op,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,,,,,
+1,3cdb66d5ceb5,quantopian/zipline,Factor.winsorize,old,potential_drift,"The documentation describes parameter(s) `inclusive`, `limits` that the current code does not have.",2,2,2,yes,LLM-assisted: R1+R2 point at the exact changed params
+1,3cdb66d5ceb5,quantopian/zipline,Factor.winsorize,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+2,a0595217ed39,LmeSzinc/AzurLaneAutoScript,Button.load_color,old,potential_drift,The documentation matches the old code better than the new code.,2,0,1,no,LLM-assisted: signals-only flag; doc still fine
+2,a0595217ed39,LmeSzinc/AzurLaneAutoScript,Button.load_color,new,potential_drift,The documentation matches the old code better than the new code.,2,0,1,no,LLM-assisted: false flag on updated doc; generic terms
+3,f7d0a6abdd9f,tornadoweb/tornado,HTTPServer.start,old,potential_drift,The documentation matches the old code better than the new code.,2,1,1,yes,LLM-assisted: correct flag (default None->1) but signals-only
+3,f7d0a6abdd9f,tornadoweb/tornado,HTTPServer.start,new,potential_drift,The documentation matches the old code better than the new code.,2,0,1,no,LLM-assisted: false flag; tiny signals
+4,fcf40a99b17f,tornadoweb/tornado,parse_qs_bytes,old,potential_drift,The documentation matches the old code better than the new code.,2,1,1,yes,LLM-assisted: correct but marginal signals
+4,fcf40a99b17f,tornadoweb/tornado,parse_qs_bytes,new,potential_drift,The documentation matches the old code better than the new code.,2,0,1,no,LLM-assisted: false flag
+5,35950e497c3a,locustio/locust,StatsEntry.extend,old,potential_drift,"The documentation mentions `add`, `full`, `history`, `seconds`, which this change removed from the code.",2,2,2,yes,LLM-assisted: R2 names removed identifier
+5,35950e497c3a,locustio/locust,StatsEntry.extend,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+6,6ff2d3fcfce4,pytorch/pytorch,ModuleList.extend,old,potential_drift,The documentation matches the old code better than the new code.,2,1,2,yes,LLM-assisted: correct signals-only flag
+6,6ff2d3fcfce4,pytorch/pytorch,ModuleList.extend,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+7,cea215b339d0,zulip/zulip,GetSubscribersTest.check_well_formed_result,old,potential_drift,"The documentation mentions `email`, which this change removed from the code.",2,2,2,yes,LLM-assisted: R2 (email) precise
+7,cea215b339d0,zulip/zulip,GetSubscribersTest.check_well_formed_result,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+8,f257fe21ffa4,Textualize/textual,ProgressBar.update,old,potential_drift,The documentation matches the old code better than the new code.,2,1,2,yes,LLM-assisted: correct signals-only flag
+8,f257fe21ffa4,Textualize/textual,ProgressBar.update,new,potential_drift,The documentation matches the old code better than the new code.,2,0,1,no,LLM-assisted: false flag
+9,d8d5e14a548b,mvt-project/mvt,DownloadAPKs.__init__,old,potential_drift,The documentation describes parameter(s) `output_folder` that the current code does not have.,2,2,2,yes,LLM-assisted: R1 output_folder exact
+9,d8d5e14a548b,mvt-project/mvt,DownloadAPKs.__init__,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: R2 'folder' generic word; correctly not decisive
+10,77c4f8608eb2,espnet/espnet,CustomConverter.__call__,old,potential_drift,The documentation matches the old code better than the new code.,2,0,1,no,LLM-assisted: flag on generic terms; doc not wrong (only verb tense changed)
+10,77c4f8608eb2,espnet/espnet,CustomConverter.__call__,new,potential_drift,The documentation matches the old code better than the new code.,2,0,1,no,LLM-assisted: false flag; same doc as old
+11,031ecf76a550,huggingface/transformers,window_reverse,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: R2 'batch' from shape text; correctly downweighted
+11,031ecf76a550,huggingface/transformers,window_reverse,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+12,daf5fa9f64fd,matplotlib/matplotlib,Axes.axline,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,1,1,1,yes,LLM-assisted: MISS: 'non-linear axes' note is stale; R2 caught 'linear' but signals overrode
+12,daf5fa9f64fd,matplotlib/matplotlib,Axes.axline,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,1,1,2,no,LLM-assisted: R2 terms are fragments (line2) / generic
+13,1e0c7304534a,pandas-dev/pandas,ExtensionDtype.construct_from_string,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: only error-string formatting changed
+13,1e0c7304534a,pandas-dev/pandas,ExtensionDtype.construct_from_string,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+14,27160876c7dc,SAML-Toolkits/python3-saml,OneLogin_Saml2_Metadata.add_x509_key_descriptors,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,1,yes,LLM-assisted: MISS: add_encryption param undocumented (R1 checks one direction only)
+14,27160876c7dc,SAML-Toolkits/python3-saml,OneLogin_Saml2_Metadata.add_x509_key_descriptors,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+15,67999c454f6b,byt3bl33d3r/CrackMapExec,CMEModule.options,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,0,0,yes,LLM-assisted: MISS: BASE_DN option undocumented; signals disagreed in sign but NOD
+15,67999c454f6b,byt3bl33d3r/CrackMapExec,CMEModule.options,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+16,247af111e091,pandas-dev/pandas,OpenpyxlReader.__init__,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,0,yes,LLM-assisted: MISS: engine_kwargs undocumented; signals disagreed but NOD
+16,247af111e091,pandas-dev/pandas,OpenpyxlReader.__init__,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+17,9aa2422d8e9c,PostHog/posthog,retrieve_entity_from,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: type narrowed; summary doc still true
+17,9aa2422d8e9c,PostHog/posthog,retrieve_entity_from,new,inconclusive,"The comparison signals disagree, so no finding is made.",2,1,1,no,LLM-assisted: inconclusive on a fine doc (overcautious)
+18,050a32902702,google-research/text-to-text-transfer-transformer,Feature.__init__,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: annotations only
+18,050a32902702,google-research/text-to-text-transfer-transformer,Feature.__init__,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+19,f479be4d1896,matplotlib/matplotlib,ColorbarBase._mesh,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,0,1,unsure,LLM-assisted: term_overlap is stopwords (the/and/for); missing vmin/vmax detail
+19,f479be4d1896,matplotlib/matplotlib,ColorbarBase._mesh,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,0,2,no,LLM-assisted: R2 'between' generic; correctly not decisive
+20,a8b4f7d96e25,pandas-dev/pandas,Series.to_dict,old,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,0,0,yes,LLM-assisted: MISS: 'into' param undocumented; signals disagreed but NOD
+20,a8b4f7d96e25,pandas-dev/pandas,Series.to_dict,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+21,cfa79d289e47,espnet/espnet,ESPnetEnhancementModel._compute_loss,old,inconclusive,The change does not clearly move the documentation's fit either way.,2,1,2,no,LLM-assisted: tiny change; inconclusive is honest
+21,cfa79d289e47,espnet/espnet,ESPnetEnhancementModel._compute_loss,new,inconclusive,The change does not clearly move the documentation's fit either way.,2,1,2,no,LLM-assisted: typo fix only; inconclusive is honest
+22,64e68c17577e,matplotlib/matplotlib,YAxis._update_label_postion,old,inconclusive,The change does not clearly move the documentation's fit either way.,2,1,1,yes,LLM-assisted: mentions nonexistent 'overlaps'; bboxes2 undocumented; deferred to review
+22,64e68c17577e,matplotlib/matplotlib,YAxis._update_label_postion,new,inconclusive,The change does not clearly move the documentation's fit either way.,2,1,1,unsure,LLM-assisted: bboxes2 still undocumented
+23,4252ec47349d,stratosphereips/StratosphereLinuxIPS,Main.close_all_ports,old,inconclusive,The change does not clearly move the documentation's fit either way.,2,1,1,no,LLM-assisted: 6379 is the redis port; doc still true
+23,4252ec47349d,stratosphereips/StratosphereLinuxIPS,Main.close_all_ports,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+24,7ebf17aa6bf3,pandas-dev/pandas,DatetimeIndex.to_series,old,inconclusive,"The comparison signals disagree, so no finding is made.",2,1,1,yes,LLM-assisted: index/name params undocumented; inconclusive not a flag
+24,7ebf17aa6bf3,pandas-dev/pandas,DatetimeIndex.to_series,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+25,50bb77bfd493,stratosphereips/StratosphereLinuxIPS,Main.update_host_ip,old,inconclusive,"The comparison signals disagree, so no finding is made.",2,1,1,no,LLM-assisted: type hints only; inconclusive overcautious
+25,50bb77bfd493,stratosphereips/StratosphereLinuxIPS,Main.update_host_ip,new,inconclusive,"The comparison signals disagree, so no finding is made.",2,1,1,no,LLM-assisted: reflow only; inconclusive overcautious
+26,6d79fa104be7,tornadoweb/tornado,RequestHandler.set_cookie,old,inconclusive,The change does not clearly move the documentation's fit either way.,2,1,2,unsure,LLM-assisted: deprecation note missing; inconclusive fits
+26,6d79fa104be7,tornadoweb/tornado,RequestHandler.set_cookie,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+27,718273ac5378,pyg-team/pytorch_geometric,Aggregation.forward,old,inconclusive,"The comparison signals disagree, so no finding is made.",2,1,1,yes,LLM-assisted: max_num_elements undocumented; inconclusive
+27,718273ac5378,pyg-team/pytorch_geometric,Aggregation.forward,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+28,f93fb84e2371,cupy/cupy,contraction,old,inconclusive,The change does not clearly move the documentation's fit either way.,2,1,2,unsure,LLM-assisted: mode_A type changed; auto-create may still accept tuples
+28,f93fb84e2371,cupy/cupy,contraction,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
+29,78e30efa60ba,zulip/zulip,StreamAdminTest.test_delete_streams_youre_not_on,old,inconclusive,"The comparison signals disagree, so no finding is made.",2,0,1,yes,LLM-assisted: behaviour flipped (private streams now deletable); inconclusive
+29,78e30efa60ba,zulip/zulip,StreamAdminTest.test_delete_streams_youre_not_on,new,potential_drift,The documentation matches the old code better than the new code.,2,0,1,no,LLM-assisted: false flag on the corrected doc
+30,e6510d4afe27,pandas-dev/pandas,na_arithmetic_op,old,inconclusive,"The comparison signals disagree, so no finding is made.",2,1,1,yes,LLM-assisted: is_cmp undocumented; inconclusive
+30,e6510d4afe27,pandas-dev/pandas,na_arithmetic_op,new,no_obvious_drift,No sign of drift: the documentation fits the new code at least as well as the old code.,2,1,2,no,LLM-assisted: correct NOD
