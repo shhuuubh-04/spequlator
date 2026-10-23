@@ -1,0 +1,10 @@
+{
+  "version": "calibrated-train-minilm-ft-2026-10-23",
+  "eps": 0.1452,
+  "scale_tfidf": 0.09079770216729176,
+  "scale_encoder": 0.07165760456019525,
+  "encoder": "minilm-ft",
+  "min_doc_words": 5,
+  "snapshot_low": null,
+  "snapshot_high": null
+}

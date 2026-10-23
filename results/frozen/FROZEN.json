@@ -1,0 +1,10 @@
+{
+  "frozen_at": "2026-10-23T05:26:39+00:00",
+  "git_commit": "a1c0dffb40bbeb2a26a9f0450d791f2191f9ac51",
+  "artifacts_sha256": {
+    "tfidf.joblib": "e87f74482cfedacb5fdc4051be6ea22456c4e958d8a80c6588bc05349d3a6d45",
+    "thresholds.json": "5fa8cbf6047989a2774028c2962d24baf33d80530aa85bb7969ed830cc84fcfd",
+    "finetune_gate.json": "8a921fdb10cdfc79f8eac94fa8d13fe82a57cd846737479b11888dc0fa20616a",
+    "minilm-ft": "53588189e713414ed664011e02ecafcbb274fea4d085b6a061abaf21ba117c56"
+  }
+}
