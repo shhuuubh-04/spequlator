@@ -134,4 +134,5 @@ class Report(BaseModel):
     explanation: str = ""
     uncertainties: list[str] = Field(default_factory=list)
     review_recommended: bool = True
+    next_step: str = ""  # recommended human review action (PRD §9)
     meta: ReportMeta = Field(default_factory=ReportMeta)

@@ -1,0 +1,4 @@
+Return the average of a list of scores.
+
+Args:
+    scores: Numeric scores to average. An empty list returns 0.0.

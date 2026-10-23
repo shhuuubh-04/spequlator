@@ -150,6 +150,18 @@
       "decision": "Install CPU-only PyTorch via a uv explicit index.",
       "status": "accepted",
       "rationale": "On Linux, PyPI torch defaults to multi-GB CUDA wheels [R21]; nothing in the plan needs a GPU."
+    },
+    {
+      "id": "D-025",
+      "status": "accepted",
+      "decision": "Refine D-017: R1 is suppressed when the function takes **kwargs; R2 counts toward potential_drift only when no delta signal exceeds its dead-band; provisional eps_tfidf=0.01 until `eval calibrate` (H3).",
+      "rationale": "Train split: R1 fires on 9.3% stale vs 1.6% updated docstrings (6.0x lift, up from 2.1x). Gating R2 cuts updated-doc flags from 24.4% to 20.1% at eps 0.01 while stale flags move 50.8% -> 48.6%. Coverage about 66% (>= 60% target)."
+    },
+    {
+      "id": "D-026",
+      "status": "accepted",
+      "decision": "Group CoDocBench projects by owner/project (project_key) for split guards, bootstrap clusters and reporting.",
+      "rationale": "Repo names 'Python' and 'manim' appear in both splits under different owners (TheAlgorithms vs Yonv1943; 3b1b vs ManimCommunity). Keyed by owner/project, overlap is zero. ManimCommunity/manim is a fork of 3b1b/manim: noted as a threat to validity."
     }
   ],
   "scope": {

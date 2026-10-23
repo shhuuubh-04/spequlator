@@ -1,0 +1,5 @@
+Fetch active users from the API.
+
+:param session: HTTP session used for the request.
+:param timeout: Seconds to wait before the request times out.
+:returns: List of active user records.
