@@ -10,15 +10,15 @@
 |---|---|
 | Data and core | CoDocBench adapter with pinned checksums; preprocessing; rules R1 and R2; report schema |
 | Signals | TF-IDF and MiniLM deltas; MiniLM fine-tuned on train, gate passed (D-020); train-only calibration (D-028) |
-| Interfaces | Typer CLI; local FastAPI service (127.0.0.1 only); React/Vite UI with change and snapshot modes, dataset examples, evidence-first results |
+| Interfaces | Typer CLI; local FastAPI service (127.0.0.1 only); React/Vite UI with change and snapshot modes, dataset examples; report-style results with a step-by-step calculation trace (D-030, D-031) |
 | Evaluation | Settings frozen (tag `frozen-eval`); one-time test run → `results/`; RQ4 review of 60 reports (LLM-scored, D-029) |
 | Docs | README, `EVALUATION_RESULTS.md` (generated from `results/`), `DEMO.md`; tag `v1.0` |
 
-Tests: 135 Python, 4 frontend.
+Tests: 148 Python, 7 frontend.
 
 ## Decisions taken during the build
 
-D-025 (R2 decisive only inside the dead-band), D-026 (owner/project cluster keys), D-027 (UniXcoder dropped from the frozen run), D-028 (single combined score with one dead-band), D-029 (LLM-scored manual review). Details in `decisions.json`; their effect on results in `EVALUATION_RESULTS.md`.
+D-025 (R2 decisive only inside the dead-band), D-026 (owner/project cluster keys), D-027 (UniXcoder dropped from the frozen run), D-028 (single combined score with one dead-band), D-029 (LLM-scored manual review), D-030 (read-only calculation trace), D-031 (report-style light UI). Details in `decisions.json`; their effect on results in `EVALUATION_RESULTS.md`.
 
 ## Known limitations
 

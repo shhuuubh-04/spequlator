@@ -180,6 +180,18 @@
       "decision": "Score the RQ4 manual review (60 reports) with an LLM plus a second re-check pass, instead of a human annotator.",
       "status": "accepted",
       "rationale": "No annotator time left before the deadline. Reported everywhere as LLM-scored, not human-verified; no agreement figure (single scorer)."
+    },
+    {
+      "id": "D-030",
+      "decision": "Add a read-only pipeline trace (POST /api/explain) for the UI's 'How it was computed' section.",
+      "status": "accepted",
+      "rationale": "Shows every NLP step with real numbers. analyze() and all frozen artifacts are unchanged; explain() recomputes each value, raises if any differs from the report, and checks the hand-built TF-IDF against scikit-learn."
+    },
+    {
+      "id": "D-031",
+      "decision": "Redesign the UI as a light, printable report: highlighter marks with margin notes, fonts bundled locally (Literata, Public Sans, IBM Plex Mono). Dark mode dropped.",
+      "status": "accepted",
+      "rationale": "Presentable directly in the demo and as a PDF; bundled fonts keep the demo working offline."
     }
   ],
   "scope": {

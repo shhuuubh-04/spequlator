@@ -1,58 +1,32 @@
 import { useEffect, useState } from "react";
 import { ApiError, api } from "./api";
-import { ExamplePicker } from "./components/ExamplePicker";
-import { Results } from "./components/Results";
-import type { AnalyzePayload, ExampleDetail, Health, Mode, Report } from "./types";
+import { InputForm } from "./components/InputForm";
+import { ReportView } from "./components/ReportView";
+import type { ExampleDetail, Explained, Health, Mode } from "./types";
 
 type Field = "documentation" | "code" | "old_code" | "new_code";
+const EMPTY: Record<Field, string> = { documentation: "", code: "", old_code: "", new_code: "" };
 
-function StatusPill({ health, down }: { health: Health | null; down: boolean }) {
-  if (down) return <span className="pill pill-bad">Service offline</span>;
-  if (!health) return <span className="pill">Checking…</span>;
-  const enc = { ready: "ready", loading: "loading…", unavailable: "unavailable", disabled: "off" }[health.encoder];
+function Status({ health, down }: { health: Health | null; down: boolean }) {
+  if (down) return <p className="status bad">Analysis service offline</p>;
+  if (!health) return <p className="status">Connecting…</p>;
+  const enc = { ready: "encoder ready", loading: "encoder loading…", unavailable: "encoder unavailable", disabled: "encoder off" }[
+    health.encoder
+  ];
   return (
-    <span className={`pill ${health.tfidf ? "" : "pill-bad"}`} title={health.encoder_name ?? ""}>
-      TF-IDF {health.tfidf ? "ready" : "missing"} · Encoder {enc}
-    </span>
-  );
-}
-
-function TextField(props: {
-  id: Field;
-  label: string;
-  hint: string;
-  value: string;
-  onChange: (v: string) => void;
-  mono?: boolean;
-  error?: string | null;
-}) {
-  return (
-    <div className="field">
-      <label htmlFor={props.id}>{props.label}</label>
-      <textarea
-        id={props.id}
-        className={props.mono ? "mono" : ""}
-        value={props.value}
-        placeholder={props.hint}
-        onChange={(e) => props.onChange(e.target.value)}
-        spellCheck={!props.mono}
-        aria-invalid={!!props.error}
-      />
-      {props.error && <p className="error">{props.error}</p>}
-    </div>
+    <p className={`status ${health.tfidf ? "" : "bad"}`} title={health.encoder_name ?? ""}>
+      {health.tfidf ? "TF-IDF ready" : "TF-IDF model missing"}, {enc}
+    </p>
   );
 }
 
 export default function App() {
+  const [view, setView] = useState<"inputs" | "report">("inputs");
   const [mode, setMode] = useState<Mode>("change");
-  const [documentation, setDocumentation] = useState("");
-  const [code, setCode] = useState("");
-  const [oldCode, setOldCode] = useState("");
-  const [newCode, setNewCode] = useState("");
+  const [values, setValues] = useState(EMPTY);
   const [example, setExample] = useState<ExampleDetail | null>(null);
   const [docVersion, setDocVersion] = useState<"old" | "new">("old");
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [report, setReport] = useState<Report | null>(null);
+  const [result, setResult] = useState<Explained | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const [health, setHealth] = useState<Health | null>(null);
@@ -74,33 +48,48 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  const setValue = (f: Field, v: string) => setValues((s) => ({ ...s, [f]: v }));
+
   const pickExample = (e: ExampleDetail) => {
     setExample(e);
     setMode("change");
-    setOldCode(e.old_code);
-    setNewCode(e.new_code);
-    setDocumentation(docVersion === "old" ? e.old_doc : e.new_doc);
-    setPickerOpen(false);
-    setReport(null);
+    setValues({ documentation: docVersion === "old" ? e.old_doc : e.new_doc, code: "", old_code: e.old_code, new_code: e.new_code });
     setError(null);
   };
 
   const switchDoc = (v: "old" | "new") => {
     setDocVersion(v);
-    if (example) setDocumentation(v === "old" ? example.old_doc : example.new_doc);
+    if (example) setValue("documentation", v === "old" ? example.old_doc : example.new_doc);
   };
 
   const ready =
-    documentation.trim() !== "" && (mode === "snapshot" ? code.trim() !== "" : oldCode.trim() !== "" && newCode.trim() !== "");
+    values.documentation.trim() !== "" &&
+    (mode === "snapshot" ? values.code.trim() !== "" : values.old_code.trim() !== "" && values.new_code.trim() !== "");
 
-  const analyze = async () => {
-    const payload: AnalyzePayload =
-      mode === "snapshot" ? { documentation, code } : { documentation, old_code: oldCode, new_code: newCode };
+  // Use the dataset route only when the fields still hold the example unchanged,
+  // so the report can name the project and function.
+  const untouchedExample =
+    example !== null &&
+    mode === "change" &&
+    values.old_code === example.old_code &&
+    values.new_code === example.new_code &&
+    values.documentation === (docVersion === "old" ? example.old_doc : example.new_doc);
+
+  const check = async () => {
     setLoading(true);
     setError(null);
     try {
-      setReport(await api.analyze(payload));
+      const out = untouchedExample
+        ? await api.explainExample(example!.record_id, docVersion)
+        : await api.explain(
+            mode === "snapshot"
+              ? { documentation: values.documentation, code: values.code }
+              : { documentation: values.documentation, old_code: values.old_code, new_code: values.new_code },
+          );
+      setResult(out);
+      setView("report");
       setDown(false);
+      window.scrollTo?.(0, 0);
     } catch (e) {
       const err = e as ApiError;
       setError(err);
@@ -110,108 +99,48 @@ export default function App() {
     }
   };
 
-  const fieldError = (f: Field) => (error && error.field === f ? error.message : null);
-  const generalError = error && !(["documentation", "code", "old_code", "new_code"] as string[]).includes(error.field ?? "");
-  const encoderMissing = report && !report.signals.encoder && health?.encoder !== "disabled";
-
   return (
-    <div className="app">
-      <header>
-        <div>
-          <h1>Spequlator</h1>
-          <p className="subtitle">Understand potential gaps between code and documentation.</p>
-        </div>
-        <StatusPill health={health} down={down} />
+    <div className="page">
+      <header className="masthead">
+        <p className="wordmark">Spequlator</p>
+        {view === "report" && result ? (
+          <nav className="actions no-print" aria-label="Report actions">
+            <button type="button" className="text-button" onClick={() => setView("inputs")}>
+              Edit inputs
+            </button>
+            <button type="button" className="text-button" onClick={() => window.print()}>
+              Print or save as PDF
+            </button>
+          </nav>
+        ) : (
+          <Status health={health} down={down} />
+        )}
       </header>
 
-      <main className={report ? "with-results" : ""}>
-        <section className="workspace">
-          <div className="toolbar">
-            <div className="segmented" role="tablist" aria-label="Analysis mode">
-              <button role="tab" aria-selected={mode === "change"} onClick={() => setMode("change")}>
-                Compare a change
-              </button>
-              <button role="tab" aria-selected={mode === "snapshot"} onClick={() => setMode("snapshot")}>
-                Check a snapshot
-              </button>
-            </div>
-            <button type="button" className="secondary" onClick={() => setPickerOpen((o) => !o)}>
-              Load dataset example
-            </button>
-          </div>
-
-          {pickerOpen && <ExamplePicker onPick={pickExample} onClose={() => setPickerOpen(false)} />}
-
-          {example && mode === "change" && (
-            <div className="example-bar">
-              <span>
-                Example: <strong>{example.function}</strong> <span className="muted">{example.project}</span>
-              </span>
-              <div className="segmented small" role="radiogroup" aria-label="Docstring version">
-                <button role="radio" aria-checked={docVersion === "old"} onClick={() => switchDoc("old")}>
-                  Docstring before commit
-                </button>
-                <button role="radio" aria-checked={docVersion === "new"} onClick={() => switchDoc("new")}>
-                  after commit
-                </button>
-              </div>
-            </div>
-          )}
-
-          <TextField
-            id="documentation"
-            label="Documentation"
-            hint="Paste the docstring or documentation passage…"
-            value={documentation}
-            onChange={setDocumentation}
-            error={fieldError("documentation")}
+      <main>
+        {view === "report" && result ? (
+          <ReportView data={result} />
+        ) : (
+          <InputForm
+            mode={mode}
+            setMode={setMode}
+            values={values}
+            setValue={setValue}
+            example={example}
+            docVersion={docVersion}
+            onPick={pickExample}
+            onDocVersion={switchDoc}
+            onClearExample={() => {
+              setExample(null);
+              setValues(EMPTY);
+            }}
+            onSubmit={check}
+            ready={ready}
+            loading={loading}
+            error={error}
           />
-          {mode === "change" ? (
-            <div className="code-pair">
-              <TextField id="old_code" label="Code before" hint="def f(x, timeout=30): …" value={oldCode} onChange={setOldCode} mono error={fieldError("old_code")} />
-              <TextField id="new_code" label="Code after" hint="def f(x, retries=3): …" value={newCode} onChange={setNewCode} mono error={fieldError("new_code")} />
-            </div>
-          ) : (
-            <TextField id="code" label="Code" hint="def f(x): …" value={code} onChange={setCode} mono error={fieldError("code")} />
-          )}
-
-          {example && mode === "change" && (
-            <details className="diff">
-              <summary>Show the commit's diffs</summary>
-              <pre>
-                {[...example.diff_docstring, "", ...example.diff_code].map((l, i) => (
-                  <div key={i} className={l.startsWith("+ ") ? "add" : l.startsWith("- ") ? "del" : ""}>
-                    {l || " "}
-                  </div>
-                ))}
-              </pre>
-            </details>
-          )}
-
-          <div className="analyze-row">
-            <button type="button" className="primary" disabled={!ready || loading} onClick={analyze}>
-              {loading ? <span className="spinner" aria-hidden /> : null}
-              {loading ? "Analyzing…" : "Analyze consistency"}
-            </button>
-            {!ready && <span className="muted">Fill in the documentation and code, or load an example.</span>}
-          </div>
-
-          {generalError && <p className="error banner">{error!.message}</p>}
-        </section>
-
-        {report && (
-          <div className={loading ? "dim" : ""}>
-            {encoderMissing && (
-              <p className="banner info">Deep-learning signal unavailable — showing TF-IDF and rule evidence only.</p>
-            )}
-            <Results report={report} />
-          </div>
         )}
       </main>
-
-      <footer className="muted">
-        Findings are heuristics for review, not verdicts. Text is analysed locally and never leaves this machine.
-      </footer>
     </div>
   );
 }

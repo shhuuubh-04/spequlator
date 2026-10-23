@@ -21,6 +21,7 @@ from spequlator.datasets import codocbench as cdb
 from spequlator.models import tfidf as tfidf_mod
 from spequlator.models.base import EncoderUnavailable
 from spequlator.pipeline.report import Thresholds
+from spequlator.pipeline.trace import Explained
 from spequlator.schemas import MAX_CHARS, AnalysisInput, Report
 
 warnings.filterwarnings("ignore", category=SyntaxWarning)  # invalid escapes in dataset code
@@ -124,6 +125,19 @@ def _run(inp: AnalysisInput, use_encoder: bool) -> Report:
     return report
 
 
+def _explain(inp: AnalysisInput, use_encoder: bool) -> Explained:
+    """Report plus the read-only step-by-step trace for the UI (D-030)."""
+    from spequlator.pipeline.trace import explain
+
+    encoder = _state["encoder"] if use_encoder else None
+    ex = explain(inp, encoder=encoder, thresholds=Thresholds.load())
+    if use_encoder and encoder is None and _state["encoder_status"] == "loading":
+        ex.report.uncertainties.append(
+            "The deep-learning model is still loading; try again shortly."
+        )
+    return ex
+
+
 def _diff_lines(diff: str) -> list[str]:
     return [ln for ln in diff.splitlines() if not ln.startswith("? ")]
 
@@ -204,3 +218,18 @@ def analyze_example(req: ExampleRequest):
     except cdb.RecordNotFound:
         return _error(404, "not_found", f"unknown example id {req.record_id!r}", "record_id")
     return _run(cdb.to_input(r, req.doc_version), req.use_encoder)
+
+
+@app.post("/api/explain", response_model=Explained)
+def explain_text(req: AnalyzeRequest) -> Explained:
+    inp = AnalysisInput(**req.model_dump(include=set(FIELDS)))
+    return _explain(inp, req.use_encoder)
+
+
+@app.post("/api/explain/example", response_model=Explained)
+def explain_example(req: ExampleRequest):
+    try:
+        r = cdb.get_record(req.record_id)
+    except cdb.RecordNotFound:
+        return _error(404, "not_found", f"unknown example id {req.record_id!r}", "record_id")
+    return _explain(cdb.to_input(r, req.doc_version), req.use_encoder)

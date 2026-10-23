@@ -60,7 +60,7 @@ uv run spequlator serve --port 8001                      # API on 127.0.0.1 only
 cd frontend && echo "SPEQULATOR_API_PORT=8001" > .env.local && npm install && npm run dev
 ```
 
-Then open http://localhost:5173. Use "Load dataset example", or paste your own docstring and code.
+Then open http://localhost:5173. Use "Start from a real commit", or paste your own docstring and code. The report marks the evidence in the docstring, shows every step of the calculation under "How it was computed", and prints as a PDF.
 
 ## Results
 

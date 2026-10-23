@@ -1,4 +1,4 @@
-import type { AnalyzePayload, ExampleDetail, ExampleSummary, Health, Report } from "./types";
+import type { AnalyzePayload, ExampleDetail, ExampleSummary, Explained, Health, Report } from "./types";
 
 /** Error from the API ({"error": {...}}) or a network failure (code "api_down"). */
 export class ApiError extends Error {
@@ -38,4 +38,7 @@ export const api = {
   examples: (q = "") => request<ExampleSummary[]>(`/api/examples?limit=50&q=${encodeURIComponent(q)}`),
   example: (id: string) => request<ExampleDetail>(`/api/examples/${encodeURIComponent(id)}`),
   analyze: (payload: AnalyzePayload) => request<Report>("/api/analyze", json(payload)),
+  explain: (payload: AnalyzePayload) => request<Explained>("/api/explain", json(payload)),
+  explainExample: (record_id: string, doc_version: "old" | "new") =>
+    request<Explained>("/api/explain/example", json({ record_id, doc_version })),
 };
