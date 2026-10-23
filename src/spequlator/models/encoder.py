@@ -24,9 +24,12 @@ class EncoderSpec:
     model_id: str  # Hugging Face id, or a local path for fine-tuned models
     revision: str | None
     max_seq_length: int
+    label: str | None = None  # display name (avoids leaking local paths into reports)
 
     @property
     def name(self) -> str:
+        if self.label:
+            return self.label
         return f"{self.model_id}@{self.revision[:7]}" if self.revision else self.model_id
 
 
@@ -51,7 +54,13 @@ def spec_for(key: str) -> EncoderSpec:
             256,  # model limit (R8)
         )
     if key == "minilm-ft":
-        return EncoderSpec("minilm-ft", str(artifacts_dir() / "minilm-ft"), None, 128)
+        return EncoderSpec(
+            "minilm-ft",
+            str(artifacts_dir() / "minilm-ft"),
+            None,
+            128,
+            label="minilm-ft (all-MiniLM-L6-v2@1110a24 fine-tuned on CoDocBench train, D-020)",
+        )
     raise ValueError(f"unknown encoder {key!r}; choose unixcoder, minilm or minilm-ft")
 
 

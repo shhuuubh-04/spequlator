@@ -226,6 +226,38 @@ def eval_calibrate(
         typer.echo(f"warning: no eps reached coverage {MIN_COVERAGE:.0%}; chose the most decisive.")
 
 
+@eval_app.command("freeze")
+def eval_freeze() -> None:
+    """Pin artifact hashes in results/frozen/ before the one-time test run (H4)."""
+    from spequlator.evaluation.frozen_eval import freeze
+
+    try:
+        path = freeze()
+    except FileNotFoundError as exc:
+        _fail(3, str(exc))
+    typer.echo(f"frozen -> {path}")
+    typer.echo('next: git add results && git commit -m "eval: freeze" && git tag frozen-eval')
+
+
+@eval_app.command("run")
+def eval_run(
+    split: Annotated[str, typer.Option()] = "test",
+    confirm_frozen: Annotated[bool, typer.Option("--confirm-frozen")] = False,
+) -> None:
+    """ONE-TIME frozen test evaluation -> results/ (metrics, tables, figures, run info)."""
+    from spequlator.evaluation.frozen_eval import FrozenMismatch, run_test
+    from spequlator.evaluation.proxy_task import FrozenSplitError
+
+    if split != "test":
+        _fail(2, "eval run is only for the frozen test split; use eval calibrate on train")
+    try:
+        typer.echo(run_test(confirm=confirm_frozen))
+    except FrozenSplitError as exc:
+        _fail(2, str(exc))
+    except (FrozenMismatch, FileNotFoundError, ArtifactMissing) as exc:
+        _fail(3, str(exc))
+
+
 def main() -> None:
     app()
 
