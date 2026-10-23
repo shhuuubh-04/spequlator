@@ -1,0 +1,216 @@
+{
+  "n_records": 2273,
+  "n_projects": 103,
+  "signals": {
+    "TF-IDF snapshot": {
+      "pairwise_accuracy": {
+        "value": 0.6764188297404311,
+        "ci95": [
+          0.6501229720446873,
+          0.7039765275243811
+        ]
+      },
+      "pairwise_accuracy_minus_baseline": {
+        "value": -0.0681918169819622,
+        "ci95": [
+          -0.09296402705064856,
+          -0.046042241035426076
+        ]
+      },
+      "pooled_auc": {
+        "value": 0.5642020977720246,
+        "ci95": [
+          0.5554527806595999,
+          0.5751797113009245
+        ]
+      },
+      "pooled_auc_minus_baseline": {
+        "value": -0.14163599972050855,
+        "ci95": [
+          -0.1607042562461099,
+          -0.12219363759694538
+        ]
+      },
+      "project_macro_pairwise_accuracy": 0.6887737946114332
+    },
+    "TF-IDF delta": {
+      "pairwise_accuracy": {
+        "value": 0.7446106467223933,
+        "ci95": [
+          0.7124646832905175,
+          0.7778298780566633
+        ]
+      },
+      "pooled_auc": {
+        "value": 0.7058380974925331,
+        "ci95": [
+          0.6822503215935064,
+          0.7285528831853012
+        ]
+      },
+      "project_macro_pairwise_accuracy": 0.7411484767682015
+    },
+    "MiniLM delta": {
+      "pairwise_accuracy": {
+        "value": 0.7124945006599208,
+        "ci95": [
+          0.6832543564805034,
+          0.7428412281103578
+        ]
+      },
+      "pairwise_accuracy_minus_baseline": {
+        "value": -0.032116146062472484,
+        "ci95": [
+          -0.048449633856211816,
+          -0.013946191797718131
+        ]
+      },
+      "pooled_auc": {
+        "value": 0.6362389526895136,
+        "ci95": [
+          0.6165661450955487,
+          0.6573610832114497
+        ]
+      },
+      "pooled_auc_minus_baseline": {
+        "value": -0.06959914480301954,
+        "ci95": [
+          -0.085354023202236,
+          -0.05525350302751844
+        ]
+      },
+      "project_macro_pairwise_accuracy": 0.7212359905656188
+    },
+    "MiniLM fine-tuned delta": {
+      "pairwise_accuracy": {
+        "value": 0.7131544214694236,
+        "ci95": [
+          0.6846797895112455,
+          0.7429090895743696
+        ]
+      },
+      "pairwise_accuracy_minus_baseline": {
+        "value": -0.03145622525296965,
+        "ci95": [
+          -0.05028814349964485,
+          -0.009075637749245441
+        ]
+      },
+      "pooled_auc": {
+        "value": 0.6595003144277328,
+        "ci95": [
+          0.6381134325213266,
+          0.6811163836763525
+        ]
+      },
+      "pooled_auc_minus_baseline": {
+        "value": -0.0463377830648003,
+        "ci95": [
+          -0.06560316867059059,
+          -0.032243419590342826
+        ]
+      },
+      "project_macro_pairwise_accuracy": 0.7299176854963422
+    },
+    "Combined (TF-IDF + minilm-ft)": {
+      "pairwise_accuracy": {
+        "value": 0.7694676638803344,
+        "ci95": [
+          0.7353422912326144,
+          0.8041640312587974
+        ]
+      },
+      "pairwise_accuracy_minus_baseline": {
+        "value": 0.024857017157941086,
+        "ci95": [
+          0.0138212242982116,
+          0.040205218223119114
+        ]
+      },
+      "pooled_auc": {
+        "value": 0.7062690444590556,
+        "ci95": [
+          0.682568155908412,
+          0.730342530776588
+        ]
+      },
+      "pooled_auc_minus_baseline": {
+        "value": 0.0004309469665224608,
+        "ci95": [
+          -0.008611305201421667,
+          0.009059505786883868
+        ]
+      },
+      "project_macro_pairwise_accuracy": 0.7550165563569357
+    }
+  },
+  "rules": {
+    "r1": {
+      "stale_rate": 0.1073471183457985,
+      "updated_rate": 0.025076990761108666,
+      "lift": 4.280701754385965
+    },
+    "r2": {
+      "stale_rate": 0.22305323361196655,
+      "updated_rate": 0.11878574571051474,
+      "lift": 1.8777777777777775
+    }
+  },
+  "decision_rule": {
+    "thresholds": "calibrated-train-minilm-ft-2026-10-23",
+    "stale_potential_drift": 0.46502419709634846,
+    "stale_no_obvious_drift": 0.16102067751869775,
+    "stale_inconclusive": 0.3739551253849538,
+    "updated_potential_drift": 0.18741750989881215,
+    "updated_no_obvious_drift": 0.42982842058952925,
+    "updated_inconclusive": 0.3827540695116586,
+    "coverage": 0.6216454025516938,
+    "balanced_accuracy_decided": 0.7195809201144621
+  },
+  "strata_pairwise_accuracy": [
+    {
+      "doc_edit_ratio": [
+        0.0,
+        0.7
+      ],
+      "n": 620,
+      "TF-IDF delta": 0.7306451612903225,
+      "MiniLM fine-tuned delta": 0.7379032258064516,
+      "Combined (TF-IDF + minilm-ft)": 0.7701612903225806
+    },
+    {
+      "doc_edit_ratio": [
+        0.7,
+        0.9
+      ],
+      "n": 688,
+      "TF-IDF delta": 0.8023255813953488,
+      "MiniLM fine-tuned delta": 0.7521802325581395,
+      "Combined (TF-IDF + minilm-ft)": 0.8015988372093024
+    },
+    {
+      "doc_edit_ratio": [
+        0.9,
+        0.95
+      ],
+      "n": 333,
+      "TF-IDF delta": 0.7432432432432432,
+      "MiniLM fine-tuned delta": 0.7087087087087087,
+      "Combined (TF-IDF + minilm-ft)": 0.7897897897897898
+    },
+    {
+      "doc_edit_ratio": [
+        0.95,
+        1.0
+      ],
+      "n": 632,
+      "TF-IDF delta": 0.6962025316455697,
+      "MiniLM fine-tuned delta": 0.6487341772151899,
+      "Combined (TF-IDF + minilm-ft)": 0.7231012658227849
+    }
+  ],
+  "encoder_truncation_rate": {
+    "minilm": 0.4038715354157501,
+    "minilm-ft": 0.6849978002639683
+  }
+}

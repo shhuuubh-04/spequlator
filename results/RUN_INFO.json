@@ -1,0 +1,36 @@
+{
+  "run_at": "2026-10-23T05:35:24+00:00",
+  "git_commit": "55535b3e30848bd023ae8b3e7509189cf9690996",
+  "python": "3.13.5",
+  "platform": "Linux-6.12.94+deb13-amd64-x86_64-with-glibc2.41",
+  "cpu_count": 8,
+  "packages": {
+    "torch": "2.14.1+cpu",
+    "transformers": "5.20.2",
+    "sentence-transformers": "6.2.0",
+    "scikit-learn": "1.9.1",
+    "numpy": "2.5.4",
+    "pandas": "3.1.0"
+  },
+  "codocbench_commit": "ee0256da15a07dcf265d5313fe51a269aa7268e0",
+  "dataset_sha256": {
+    "codocbench.jsonl": "c0e8563af0baf9eab4fe1341fd0bf2099ec41030fd5c2224f1c3803a712c21d4",
+    "train.jsonl": "9eef860afedcbf059a4f2e408cafbaa6c61ffbf4369e687a9b45ae80f7ac7c6d",
+    "test.jsonl": "74e3da99744a43bdf1be77c57eb1069548911c30fd931a49bbc7d0d5050dcdea"
+  },
+  "frozen": {
+    "frozen_at": "2026-10-23T05:26:39+00:00",
+    "git_commit": "a1c0dffb40bbeb2a26a9f0450d791f2191f9ac51",
+    "artifacts_sha256": {
+      "tfidf.joblib": "e87f74482cfedacb5fdc4051be6ea22456c4e958d8a80c6588bc05349d3a6d45",
+      "thresholds.json": "5fa8cbf6047989a2774028c2962d24baf33d80530aa85bb7969ed830cc84fcfd",
+      "finetune_gate.json": "8a921fdb10cdfc79f8eac94fa8d13fe82a57cd846737479b11888dc0fa20616a",
+      "minilm-ft": "53588189e713414ed664011e02ecafcbb274fea4d085b6a061abaf21ba117c56"
+    }
+  },
+  "seeds": {
+    "feasibility_and_finetune": 13,
+    "bootstrap": 2026
+  },
+  "n_boot": 1000
+}
