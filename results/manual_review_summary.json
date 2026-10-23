@@ -34,6 +34,6 @@
       "uncertainty_calibration": 1.38
     }
   },
-  "needs_update_yes_rate_old": 0.6,
+  "needs_update_yes_rate_old": 0.567,
   "needs_update_yes_rate_new": 0.0
 }

@@ -1,33 +1,42 @@
 # Spequlator — Project status
 
-- **Date:** 2026-10-22
-- **Version:** 1.2
-- **Status:** Scope frozen and evidence-backed; ready to start the 10-hour build
+- **Date:** 2026-10-23
+- **Version:** 1.0 (git tag `v1.0`)
+- **Status:** Built, evaluated once on the frozen test split, documented. Ready to demo.
 
-## Frozen direction
+## Done
 
-- Code–documentation consistency analysis and explanation system, **change-aware first** (D-016).
-- Interfaces: Typer CLI and React/Vite/TS frontend over one Python core via FastAPI (D-011, D-012 accepted).
-- Primary dataset: CoDocBench, pinned and checksummed, CC BY 4.0 (D-023). SAFA is supplementary; SciCoQA is future work.
-- Evaluation: stale-vs-updated proxy task (D-015), project-cluster bootstrap, one frozen test run (D-021).
-- Signals:
-  - TF-IDF delta-alignment (baseline)
-  - UniXcoder (pretrained, D-018)
-  - MiniLM fine-tuned on train (D-020, gated)
-  - Rules R1 and R2 (D-017)
-- Reports show evidence and uncertainty and may return `inconclusive`.
+| Part | Result |
+|---|---|
+| Data and core | CoDocBench adapter with pinned checksums; preprocessing; rules R1 and R2; report schema |
+| Signals | TF-IDF and MiniLM deltas; MiniLM fine-tuned on train, gate passed (D-020); train-only calibration (D-028) |
+| Interfaces | Typer CLI; local FastAPI service (127.0.0.1 only); React/Vite UI with change and snapshot modes, dataset examples, evidence-first results |
+| Evaluation | Settings frozen (tag `frozen-eval`); one-time test run → `results/`; RQ4 review of 60 reports (LLM-scored, D-029) |
+| Docs | README, `EVALUATION_RESULTS.md` (generated from `results/`), `DEMO.md`; tag `v1.0` |
 
-## Completed
+Tests: 135 Python, 4 frontend.
 
-- Dataset structure, overlap and traceability audits (v1.1).
-- CoDocBench collection rule confirmed from the paper [R1], plus licence [R3], pinned commit and checksums.
-- Train-only feasibility runs F1–F9: signal comparison, rules, encoder load and timing, fine-tune feasibility.
-- Decisions D-015 to D-024 recorded; all docs updated to v1.2.
+## Decisions taken during the build
 
-## Outstanding (the 10-hour build)
+D-025 (R2 decisive only inside the dead-band), D-026 (owner/project cluster keys), D-027 (UniXcoder dropped from the frozen run), D-028 (single combined score with one dead-band), D-029 (LLM-scored manual review). Details in `decisions.json`; their effect on results in `EVALUATION_RESULTS.md`.
 
-- Everything in `10_HOUR_PLAN.md` H0–H9.
+## Known limitations
+
+- R1 does not flag a newly added parameter that the docstring never mentions.
+- Disagreeing signals can still average into a confident `no_obvious_drift`.
+- The RQ4 review is LLM-scored by a single scorer; no human agreement figure.
+- Results are on the CoDocBench proxy task, not real-world drift.
+
+## Future work
+
+1. Reverse R1 ("R1b"): new parameters missing from the docstring.
+2. Return `inconclusive` when TF-IDF and the encoder point in opposite directions.
+3. Drop stopwords from the "terms shared" evidence.
+4. A human-annotated review with two annotators and κ.
+5. UniXcoder and SciCoQA as a second dataset.
+
+Any of these changes the frozen system, so each needs a new decision entry and a fresh frozen run on new data.
 
 ## Change control
 
-Any scope, dataset, architecture or evaluation change must be recorded as a new decision entry in root `decisions.json` and reflected in the relevant docs **before** implementation. This includes changes made at a cut line.
+Any scope, dataset, architecture or evaluation change must be recorded as a new decision entry in root `decisions.json` and reflected in the relevant docs **before** implementation.
