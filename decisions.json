@@ -162,6 +162,12 @@
       "status": "accepted",
       "decision": "Group CoDocBench projects by owner/project (project_key) for split guards, bootstrap clusters and reporting.",
       "rationale": "Repo names 'Python' and 'manim' appear in both splits under different owners (TheAlgorithms vs Yonv1943; 3b1b vs ManimCommunity). Keyed by owner/project, overlap is zero. ManimCommunity/manim is a fork of 3b1b/manim: noted as a threat to validity."
+    },
+    {
+      "id": "D-027",
+      "status": "accepted",
+      "decision": "Main evaluation and live app use MiniLM (pretrained and, per D-020, fine-tuned) as the deep-learning signal. UniXcoder (D-018) becomes optional: run only on a GPU or if time remains, reported as an extra row.",
+      "rationale": "Measured on the build machine (8 CPU cores): MiniLM train cache 283 s; UniXcoder projected about 25-45 min per split on CPU, repeated for test, and the first attempt ended in a machine crash. Train-sample delta AUC was similar (UniXcoder 0.641 vs MiniLM 0.632, F8)."
     }
   ],
   "scope": {
