@@ -168,6 +168,12 @@
       "status": "accepted",
       "decision": "Main evaluation and live app use MiniLM (pretrained and, per D-020, fine-tuned) as the deep-learning signal. UniXcoder (D-018) becomes optional: run only on a GPU or if time remains, reported as an extra row.",
       "rationale": "Measured on the build machine (8 CPU cores): MiniLM train cache 283 s; UniXcoder projected about 25-45 min per split on CPU, repeated for test, and the first attempt ended in a machine crash. Train-sample delta AUC was similar (UniXcoder 0.641 vs MiniLM 0.632, F8)."
+    },
+    {
+      "id": "D-028",
+      "status": "accepted",
+      "decision": "Replace the D-017 'all delta signals must agree' rule with one combined score: the mean of each available delta signal divided by its train standard deviation, with a single dead-band eps calibrated on train (coverage >= 60%). If no eps reaches 60% coverage, calibration picks the most decisive eps and warns.",
+      "rationale": "With MiniLM, the agreement rule could not reach 60% coverage on train; the old fallback then chose eps with coverage 0.402, about 60% inconclusive. Averaging standardised TF-IDF and encoder signals gave the best pairwise accuracy in feasibility (F9: 0.778 vs 0.760 TF-IDF alone), and lets the encoder contribute to every decision instead of acting as a veto."
     }
   ],
   "scope": {

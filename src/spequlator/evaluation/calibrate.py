@@ -1,13 +1,14 @@
 """Learn the decision-rule dead-bands (epsilon) on the TRAIN split only (D-017, D-021).
 
-Objective: maximise balanced accuracy over *decided* cases (stale -> potential_drift,
-updated -> no_obvious_drift) subject to coverage (share not inconclusive) >= 60%.
-Grids are quantiles of |delta| so TF-IDF and encoder scales are handled alike.
+Signals are put on a common scale (divided by their train standard deviation) and averaged
+into one score (D-028). The dead-band eps on that score is chosen to maximise balanced
+accuracy over *decided* cases (stale -> potential_drift, updated -> no_obvious_drift)
+subject to coverage (share not inconclusive) >= 60%. If no eps reaches 60%, the eps with
+the highest coverage is chosen and flagged, never a less decisive one.
 """
 
 from __future__ import annotations
 
-import itertools
 from dataclasses import replace
 from datetime import date
 
@@ -59,32 +60,35 @@ def outcomes(df: pd.DataFrame, th: Thresholds, use_encoder: bool) -> dict[str, f
     return out
 
 
-def _grid(values: pd.Series) -> list[float]:
-    return sorted({round(float(np.quantile(values.abs(), q)), 4) for q in QUANTILES})
-
-
 def calibrate(df: pd.DataFrame, encoder: str | None) -> tuple[Thresholds, pd.DataFrame]:
     use_enc = encoder is not None
-    t_grid = _grid(pd.concat([df["stale_tfidf_delta"], df["updated_tfidf_delta"]]))
-    e_grid = (
-        _grid(pd.concat([df["stale_enc_delta"], df["updated_enc_delta"]])) if use_enc else [0.0]
+    t_all = pd.concat([df["stale_tfidf_delta"], df["updated_tfidf_delta"]])
+    scale_t = float(t_all.std()) or 1.0
+    scale_e = 1.0
+    if use_enc:
+        scale_e = float(pd.concat([df["stale_enc_delta"], df["updated_enc_delta"]]).std()) or 1.0
+    base = Thresholds(encoder=encoder, scale_tfidf=scale_t, scale_encoder=scale_e)
+    z = [
+        base.combined(t, e if use_enc else None)
+        for pair in PAIRS
+        for t, e in zip(
+            df[f"{pair}_tfidf_delta"],
+            df[f"{pair}_enc_delta"] if use_enc else [None] * len(df),
+            strict=True,
+        )
+    ]
+    grid = sorted({round(float(np.quantile(np.abs(z), q)), 4) for q in QUANTILES})
+    table = pd.DataFrame(
+        [{"eps": eps, **outcomes(df, replace(base, eps=eps), use_enc)} for eps in grid]
     )
-    base = Thresholds(encoder=encoder)
-    rows = []
-    for et, ee in itertools.product(t_grid, e_grid):
-        th = replace(base, eps_tfidf=et, eps_encoder=ee)
-        rows.append({"eps_tfidf": et, "eps_encoder": ee, **outcomes(df, th, use_enc)})
-    table = pd.DataFrame(rows)
     ok = table[table["coverage"] >= MIN_COVERAGE]
-    best = (
-        (ok if len(ok) else table)
-        .sort_values(["balanced_accuracy_decided", "coverage"], ascending=False)
-        .iloc[0]
-    )
+    if len(ok):
+        best = ok.sort_values(["balanced_accuracy_decided", "coverage"], ascending=False).iloc[0]
+    else:  # constraint unreachable: be as decisive as possible, and say so
+        best = table.sort_values("coverage", ascending=False).iloc[0]
     chosen = replace(
         base,
         version=f"calibrated-train-{encoder or 'tfidf'}-{date.today().isoformat()}",
-        eps_tfidf=float(best["eps_tfidf"]),
-        eps_encoder=float(best["eps_encoder"]),
+        eps=float(best["eps"]),
     )
     return chosen, table

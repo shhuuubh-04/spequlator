@@ -3,7 +3,7 @@ import pytest
 from spequlator.nlp.rules import R1Result, R2Result
 from spequlator.pipeline.report import Thresholds, decide, next_step_for, summary_for
 
-TH = Thresholds(eps_tfidf=0.01, eps_encoder=0.01)
+TH = Thresholds(eps=0.01)
 NO_R1 = R1Result(applicable=True, fired=False)
 R1_FIRED = R1Result(applicable=True, fired=True, stale_params=["timeout"], def_line="def f(x):")
 NO_R2 = R2Result(applicable=True, fired=False)
@@ -27,6 +27,7 @@ def _d(mode="change", r1=NO_R1, r2=NO_R2, tfidf=0.0, encoder=None, words=20, th=
         ({"tfidf": 0.005}, "inconclusive", "signals_weak"),
         ({"tfidf": -0.2}, "potential_drift", "signals_negative"),  # encoder unavailable
         ({"mode": "snapshot", "r2": None, "tfidf": 0.9}, "inconclusive", "snapshot_no_rule"),
+        ({"tfidf": 0.05, "encoder": -0.01}, "no_obvious_drift", "signals_positive"),  # no veto
     ],
 )
 def test_decision_truth_table(kwargs, finding, reason):
@@ -42,7 +43,7 @@ def test_snapshot_thresholds_when_configured():
 
 def test_thresholds_roundtrip_and_default(tmp_path):
     assert Thresholds.load(tmp_path / "none.json") == Thresholds()
-    th = Thresholds(version="calibrated-test", eps_tfidf=0.02)
+    th = Thresholds(version="calibrated-test", eps=0.5, scale_tfidf=0.04, encoder="minilm")
     assert Thresholds.load(th.save(tmp_path / "t.json")) == th
 
 
@@ -60,3 +61,10 @@ def test_text_templates_exist_and_use_neutral_language(reason):
     assert text.strip()
     for banned in ("bug", "confidence", "probability", "definitely"):
         assert banned not in text
+
+
+def test_combined_score_uses_train_scales():
+    th = Thresholds(eps=1.0, scale_tfidf=0.05, scale_encoder=0.02)
+    assert th.combined(-0.06, -0.03) == pytest.approx(-1.35)
+    assert _d(tfidf=-0.06, encoder=-0.03, th=th).finding == "potential_drift"
+    assert _d(tfidf=-0.06, encoder=0.03, th=th).reason == "signals_disagree"

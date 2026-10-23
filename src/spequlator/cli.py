@@ -200,7 +200,7 @@ def eval_calibrate(
     encoder: Annotated[EncKey | None, typer.Option(help="Encoder to calibrate with.")] = None,
 ) -> None:
     """Learn epsilon dead-bands on TRAIN signals and write artifacts/thresholds.json."""
-    from spequlator.evaluation.calibrate import calibrate, load_signals
+    from spequlator.evaluation.calibrate import MIN_COVERAGE, calibrate, load_signals
 
     key = encoder.value if encoder else None
     try:
@@ -213,11 +213,17 @@ def eval_calibrate(
         )
     th, table = calibrate(df, key)
     path = th.save()
-    cols = ["eps_tfidf", "eps_encoder", "coverage", "balanced_accuracy_decided",
+    cols = ["eps", "coverage", "balanced_accuracy_decided",
             "stale_potential_drift", "updated_potential_drift"]  # fmt: skip
-    best = table.sort_values("balanced_accuracy_decided", ascending=False).head(5)[cols]
-    typer.echo(best.to_string(index=False, float_format=lambda v: f"{v:.3f}"))
-    typer.echo(f"\nchosen eps_tfidf={th.eps_tfidf} eps_encoder={th.eps_encoder} -> {path}")
+    typer.echo(table[cols].to_string(index=False, float_format=lambda v: f"{v:.3f}"))
+    row = table[table["eps"] == th.eps].iloc[0]
+    typer.echo(
+        f"\nchosen eps={th.eps} (scale_tfidf={th.scale_tfidf:.4f}, "
+        f"scale_encoder={th.scale_encoder:.4f}) coverage={row['coverage']:.3f} "
+        f"balanced_accuracy={row['balanced_accuracy_decided']:.3f} -> {path}"
+    )
+    if row["coverage"] < MIN_COVERAGE:
+        typer.echo(f"warning: no eps reached coverage {MIN_COVERAGE:.0%}; chose the most decisive.")
 
 
 def main() -> None:
