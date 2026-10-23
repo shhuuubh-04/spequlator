@@ -6,6 +6,7 @@ Exit codes: 0 analysis done (also when the encoder is unavailable) | 1 unexpecte
 
 from __future__ import annotations
 
+import json
 import sys
 import warnings
 from enum import Enum
@@ -256,6 +257,48 @@ def eval_run(
         _fail(2, str(exc))
     except (FrozenMismatch, FileNotFoundError, ArtifactMissing) as exc:
         _fail(3, str(exc))
+
+
+@eval_app.command("review-sample")
+def eval_review_sample(
+    n: Annotated[int, typer.Option(help="Test records (x2 reports).")] = 30,
+    seed: Annotated[int, typer.Option()] = 2026,
+) -> None:
+    """Build the manual-review set: results/manual_review.csv + manual_review_packets.md (H8)."""
+    from spequlator.evaluation.frozen_eval import FrozenMismatch, verify_frozen
+    from spequlator.evaluation.manual_review import build_review
+
+    try:
+        verify_frozen()
+        csv_path, md_path = build_review(n, seed)
+    except (FrozenMismatch, FileNotFoundError, ArtifactMissing) as exc:
+        _fail(3, str(exc))
+    typer.echo(
+        f"read:  {md_path}\nscore: {csv_path}  (0-2 per rubric column, needs_update yes/no/unsure)"
+    )
+
+
+@eval_app.command("review-summary")
+def eval_review_summary() -> None:
+    """Summarise the filled rubric -> results/manual_review_summary.json."""
+    from spequlator.evaluation.manual_review import summarize
+
+    try:
+        summary = summarize()
+    except (FileNotFoundError, ValueError) as exc:
+        _fail(2, str(exc))
+    typer.echo(json.dumps(summary, indent=2))
+
+
+@eval_app.command("demo-examples")
+def eval_demo_examples(
+    n: Annotated[int, typer.Option()] = 11,
+    seed: Annotated[int, typer.Option()] = 2026,
+) -> None:
+    """Pick readable demo examples at random (never by outcome) -> results/demo_examples.json."""
+    from spequlator.evaluation.manual_review import write_demo_examples
+
+    typer.echo(f"wrote {write_demo_examples(n, seed)}")
 
 
 @app.command()
