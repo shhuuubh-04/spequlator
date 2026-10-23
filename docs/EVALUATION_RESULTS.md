@@ -47,7 +47,7 @@ Figure: `results/figures/auc_ci.png` (pooled AUC with 95% CIs).
   - Fine-tuned MiniLM delta AUC minus TF-IDF delta: -0.046 [-0.066, -0.032], which is lower, and the 95% CI excludes zero.
   - Fine-tuning (D-020) moved MiniLM's pooled AUC by +0.023 (point estimate) over the pretrained model.
   - The combined score (TF-IDF + fine-tuned MiniLM, D-028) reaches pairwise accuracy 0.769 [0.735, 0.804] against 0.745 [0.712, 0.778] for TF-IDF delta. Paired difference: 0.025 [0.014, 0.040], which is higher, and the 95% CI excludes zero. Its pooled AUC difference is 0.000 [-0.009, 0.009].
-- **RQ3. Do the rules add precise evidence?** They fire rarely but are much more frequent on stale pairs:
+- **RQ3. Do the rules add precise evidence?** R1 is a strong signal; R2 is a weak one, which is why it only decides inside the dead-band (D-025):
   - R1 (parameter mismatch) fires on 10.7% of stale and 2.5% of updated pairs (lift 4.3x).
   - R2 (removed identifier still mentioned) fires on 22.3% of stale and 11.9% of updated pairs (lift 1.9x).
   - The three-state decision rule decides 62.2% of reports, with balanced accuracy 0.720 on the decided ones; the rest are `inconclusive` by design.

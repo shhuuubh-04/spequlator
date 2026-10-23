@@ -45,7 +45,7 @@ Show `results/figures/auc_ci.png` and the answers in `docs/EVALUATION_RESULTS.md
 - The task is a **proxy**: tell the docstring the authors replaced from the one they wrote. Test split opened once, after freezing.
 - Comparing against the change beats a snapshot comparison (RQ1).
 - The fine-tuned encoder alone doesn't beat TF-IDF; together they give the best pairwise accuracy (RQ2).
-- The rules are rare but precise (RQ3).
+- R1 is a strong, specific signal (4.3x more often on stale docstrings); R2 is weaker (1.9x) (RQ3).
 
 **6. Limits and next step (45 s)**
 - "The manual review of 60 reports was scored by an LLM, not a human, and we say so."

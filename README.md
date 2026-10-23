@@ -69,7 +69,7 @@ The test split was opened once, after freezing every setting (tag `frozen-eval`)
 - Full numbers with 95% project-cluster CIs: [`docs/EVALUATION_RESULTS.md`](docs/EVALUATION_RESULTS.md), [`results/tables.md`](results/tables.md), [`results/figures/auc_ci.png`](results/figures/auc_ci.png).
 - Comparing against the code change beats comparing against a snapshot of the code.
 - The fine-tuned encoder alone does not beat TF-IDF; combined with TF-IDF it gives the best pairwise accuracy (the evaluation doc says whether that gain is statistically clear).
-- The rules fire rarely but are much more frequent on stale docstrings, and give the most specific evidence.
+- Rule R1 fires 4.3x more often on stale docstrings and names the exact parameter; R2 is weaker (1.9x) and only decides close calls.
 - The manual review of 60 reports was **scored by an LLM, not a human** (D-029); see the evaluation doc for what it found.
 
 ## Limitations

@@ -69,7 +69,7 @@ Figure: `results/figures/auc_ci.png` (pooled AUC with 95% CIs).
   - Fine-tuned MiniLM delta AUC minus TF-IDF delta: {ci(ft["pooled_auc_minus_baseline"])}, which is {side(ft["pooled_auc_minus_baseline"])}.
   - Fine-tuning (D-020) moved MiniLM's pooled AUC by {ft_gain:+.3f} (point estimate) over the pretrained model.
   - The combined score (TF-IDF + fine-tuned MiniLM, D-028) reaches pairwise accuracy {ci(cmb["pairwise_accuracy"])} against {ci(base["pairwise_accuracy"])} for TF-IDF delta. Paired difference: {ci(cmb["pairwise_accuracy_minus_baseline"])}, which is {side(cmb["pairwise_accuracy_minus_baseline"])}. Its pooled AUC difference is {ci(cmb["pooled_auc_minus_baseline"])}.
-- **RQ3. Do the rules add precise evidence?** They fire rarely but are much more frequent on stale pairs:
+- **RQ3. Do the rules add precise evidence?** R1 is a strong signal; R2 is a weak one, which is why it only decides inside the dead-band (D-025):
   - R1 (parameter mismatch) fires on {r1["stale_rate"]:.1%} of stale and {r1["updated_rate"]:.1%} of updated pairs (lift {r1["lift"]:.1f}x).
   - R2 (removed identifier still mentioned) fires on {r2["stale_rate"]:.1%} of stale and {r2["updated_rate"]:.1%} of updated pairs (lift {r2["lift"]:.1f}x).
   - The three-state decision rule decides {d["coverage"]:.1%} of reports, with balanced accuracy {d["balanced_accuracy_decided"]:.3f} on the decided ones; the rest are `inconclusive` by design.
