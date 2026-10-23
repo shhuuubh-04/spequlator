@@ -258,6 +258,17 @@ def eval_run(
         _fail(3, str(exc))
 
 
+@app.command()
+def serve(
+    port: Annotated[int, typer.Option(help="Port on 127.0.0.1.")] = 8000,
+    reload: Annotated[bool, typer.Option(help="Auto-reload on code changes.")] = False,
+) -> None:
+    """Start the API on 127.0.0.1 (local only, D-022). The frontend proxies /api to it."""
+    import uvicorn
+
+    uvicorn.run("spequlator.api:app", host="127.0.0.1", port=port, reload=reload)
+
+
 def main() -> None:
     app()
 
