@@ -28,6 +28,7 @@ class Thresholds:
     version: str = "default-train-provisional-2026-10-23"
     eps_tfidf: float = 0.01
     eps_encoder: float = 0.0
+    encoder: str | None = None  # encoder key the eps values were calibrated for
     min_doc_words: int = 5
     snapshot_low: float | None = (
         None  # snapshot similarity is weak (F3): unset = no score-only finding

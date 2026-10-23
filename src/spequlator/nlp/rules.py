@@ -10,6 +10,7 @@ R2 — deleted-identifier mention: the docstring mentions an identifier token th
 from __future__ import annotations
 
 import ast
+import warnings
 from dataclasses import dataclass, field
 
 import docstring_parser
@@ -21,7 +22,9 @@ _IMPLICIT = frozenset({"self", "cls"})
 
 def _first_function(code: str) -> ast.FunctionDef | ast.AsyncFunctionDef | None:
     try:
-        tree = ast.parse(dedent_code(code))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", SyntaxWarning)  # invalid escapes in old code
+            tree = ast.parse(dedent_code(code))
     except SyntaxError:
         return None
     for node in ast.walk(tree):
