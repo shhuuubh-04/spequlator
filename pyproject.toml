@@ -54,4 +54,5 @@ torch = [{ index = "pytorch-cpu" }]
 markers = ["encoder: needs downloaded transformer weights (slow)"]
 
 [tool.ruff]
+extend-exclude = ["scripts/feasibility"]
 line-length = 100
