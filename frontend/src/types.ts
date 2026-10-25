@@ -129,6 +129,19 @@ export interface Check {
   outcome: Finding;
 }
 
+export interface CrossStep {
+  model: string;
+  input_format: string;
+  max_len: number;
+  score: number;
+  lean: "fits" | "stale";
+  words: { start: number; end: number; weight: number }[];
+  n_words: number;
+  passes: number;
+  toward_stale: string[];
+  toward_fits: string[];
+}
+
 export interface Trace {
   trace_version: string;
   mode: Mode;
@@ -146,6 +159,7 @@ export interface Trace {
   decision: { checks: Check[]; reason: string; finding: Finding };
   text: { reason: string; summary: string; next_step: string };
   constants: { thresholds_version: string; eps: number; scale_tfidf: number; scale_encoder: number; min_doc_words: number; encoder_key: string | null };
+  cross?: CrossStep | null;
 }
 
 export interface Explained {
@@ -160,6 +174,7 @@ export interface Health {
   encoder: "ready" | "loading" | "unavailable" | "disabled";
   encoder_name: string | null;
   thresholds: string;
+  cross?: "ready" | "loading" | "absent";
 }
 
 export interface ExampleSummary {
@@ -179,6 +194,7 @@ export interface ExampleDetail extends ExampleSummary {
 }
 
 export interface AnalyzePayload {
+  cross_words?: boolean;
   documentation: string;
   code?: string;
   old_code?: string;

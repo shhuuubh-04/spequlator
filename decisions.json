@@ -192,6 +192,12 @@
       "decision": "Redesign the UI as a light, printable report: highlighter marks with margin notes, fonts bundled locally (Literata, Public Sans, IBM Plex Mono). Dark mode dropped.",
       "status": "accepted",
       "rationale": "Presentable directly in the demo and as a PDF; bundled fonts keep the demo working offline."
+    },
+    {
+      "id": "D-032",
+      "status": "accepted",
+      "decision": "Phase 2: train-split-only GPU experiments (MiniLM sweep and ablations, cross-encoder) on Kaggle; import with hash checks; one declared second test run. v1's decision rule and results stay frozen; the cross-encoder is shown as a separate second opinion with an occlusion heatmap.",
+      "rationale": "Strengthens the deep-learning part with tuning, ablations and a second architecture, without changing v1's frozen findings. Selection rules are pre-registered in notebooks/phase2_train.ipynb."
     }
   ],
   "scope": {

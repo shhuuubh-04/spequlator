@@ -13,9 +13,11 @@ function Status({ health, down }: { health: Health | null; down: boolean }) {
   const enc = { ready: "encoder ready", loading: "encoder loading…", unavailable: "encoder unavailable", disabled: "encoder off" }[
     health.encoder
   ];
+  const cross = health.cross === "ready" ? ", cross-encoder ready" : health.cross === "loading" ? ", cross-encoder loading…" : "";
   return (
     <p className={`status ${health.tfidf ? "" : "bad"}`} title={health.encoder_name ?? ""}>
       {health.tfidf ? "TF-IDF ready" : "TF-IDF model missing"}, {enc}
+      {cross}
     </p>
   );
 }
@@ -27,6 +29,7 @@ export default function App() {
   const [example, setExample] = useState<ExampleDetail | null>(null);
   const [docVersion, setDocVersion] = useState<"old" | "new">("old");
   const [result, setResult] = useState<Explained | null>(null);
+  const [wordsBusy, setWordsBusy] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<ApiError | null>(null);
   const [health, setHealth] = useState<Health | null>(null);
@@ -75,17 +78,32 @@ export default function App() {
     values.new_code === example.new_code &&
     values.documentation === (docVersion === "old" ? example.old_doc : example.new_doc);
 
+  const request = (crossWords: boolean) =>
+    untouchedExample
+      ? api.explainExample(example!.record_id, docVersion, crossWords)
+      : api.explain(
+          mode === "snapshot"
+            ? { documentation: values.documentation, code: values.code }
+            : { documentation: values.documentation, old_code: values.old_code, new_code: values.new_code, cross_words: crossWords },
+        );
+
+  // The word heatmap costs one model pass per word, so it is fetched only when asked for.
+  const explainWords = async () => {
+    setWordsBusy(true);
+    try {
+      setResult(await request(true));
+    } catch (e) {
+      setError(e as ApiError);
+    } finally {
+      setWordsBusy(false);
+    }
+  };
+
   const check = async () => {
     setLoading(true);
     setError(null);
     try {
-      const out = untouchedExample
-        ? await api.explainExample(example!.record_id, docVersion)
-        : await api.explain(
-            mode === "snapshot"
-              ? { documentation: values.documentation, code: values.code }
-              : { documentation: values.documentation, old_code: values.old_code, new_code: values.new_code },
-          );
+      const out = await request(false);
       setResult(out);
       setView("report");
       setDown(false);
@@ -119,7 +137,7 @@ export default function App() {
 
       <main>
         {view === "report" && result ? (
-          <ReportView data={result} />
+          <ReportView data={result} onExplainWords={explainWords} busy={wordsBusy} />
         ) : (
           <InputForm
             mode={mode}

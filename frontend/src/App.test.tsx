@@ -75,6 +75,48 @@ describe("App", () => {
     expect(screen.getByLabelText("Documentation")).toHaveValue(":param timeout: seconds");
   });
 
+  it("shows the cross-encoder second opinion and fetches the word heatmap on request", async () => {
+    const cross = {
+      model: "cross-encoder (test)",
+      input_format: "diff",
+      max_len: 512,
+      score: -1.2,
+      lean: "stale" as const,
+      words: [],
+      n_words: 0,
+      passes: 1,
+      toward_stale: [],
+      toward_fits: [],
+    };
+    const doc = explained.trace.documentation;
+    const at = doc.indexOf("timeout");
+    const withWords = {
+      ...cross,
+      words: [{ start: at, end: at + 7, weight: -0.9 }],
+      n_words: 1,
+      passes: 2,
+      toward_stale: ["timeout"],
+    };
+    const bodies: string[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((url: string, init?: RequestInit) => {
+        if (url.startsWith("/api/health")) return Promise.resolve(Response.json(health));
+        bodies.push(String(init?.body));
+        const words = JSON.parse(String(init?.body)).cross_words;
+        return Promise.resolve(Response.json({ ...explained, trace: { ...explained.trace, cross: words ? withWords : cross } }));
+      }),
+    );
+    render(<App />);
+    fillChangeForm();
+    fireEvent.click(screen.getByRole("button", { name: /check documentation/i }));
+    expect(await screen.findByText("Leans: looks stale")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /show which words mattered/i }));
+    expect(await screen.findByText(/Pushed most toward "stale"/)).toBeInTheDocument();
+    expect(document.querySelector(".heat-word")?.textContent).toBe("timeout");
+    expect(JSON.parse(bodies[1]).cross_words).toBe(true);
+  });
+
   it("shows a field-level validation error from the API", async () => {
     const body = { error: { code: "invalid_input", message: "old_code: must not be empty", field: "old_code" } };
     mockFetch(() => Promise.resolve(Response.json(body, { status: 422 })));

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FINDING_LABEL, num } from "../format";
 import type { DiffLine, Explained, Note } from "../types";
 import { MarginNotes, Marked, Ticks } from "./Marked";
+import { CrossOpinion } from "./CrossOpinion";
 import { Method } from "./Method";
 
 const DIFF_PREVIEW = 30;
@@ -122,7 +123,15 @@ function Signals({ data }: { data: Explained }) {
   );
 }
 
-export function ReportView({ data }: { data: Explained }) {
+export function ReportView({
+  data,
+  onExplainWords,
+  busy,
+}: {
+  data: Explained;
+  onExplainWords?: () => void;
+  busy?: boolean;
+}) {
   const { report, trace } = data;
   const src = report.source;
   const docLabel =
@@ -192,6 +201,13 @@ export function ReportView({ data }: { data: Explained }) {
         <h2 id="h-signals">Signals</h2>
         <Signals data={data} />
       </section>
+
+      {trace.cross && (
+        <section aria-labelledby="h-cross">
+          <h2 id="h-cross">Second opinion: cross-encoder</h2>
+          <CrossOpinion cross={trace.cross} documentation={trace.documentation} onExplainWords={onExplainWords} busy={busy} />
+        </section>
+      )}
 
       <section aria-labelledby="h-method">
         <h2 id="h-method">How it was computed</h2>

@@ -209,6 +209,27 @@ class Constants(BaseModel):
     encoder_key: str | None
 
 
+class CrossWord(BaseModel):
+    start: int
+    end: int
+    weight: float  # score with the word minus score without it; > 0 = pushed toward "fits"
+
+
+class CrossStep(BaseModel):
+    """Phase-2 cross-encoder second opinion (D-032). Shown beside v1; not part of the decision."""
+
+    model: str
+    input_format: str
+    max_len: int
+    score: float  # logit: > 0 leans "fits the new code", < 0 leans "stale"; not a probability
+    lean: Literal["fits", "stale"]
+    words: list[CrossWord]
+    n_words: int
+    passes: int
+    toward_stale: list[str]
+    toward_fits: list[str]
+
+
 class Trace(BaseModel):
     trace_version: Literal["1"] = "1"
     mode: str
@@ -226,6 +247,7 @@ class Trace(BaseModel):
     decision: DecisionStep
     text: TextStep
     constants: Constants
+    cross: CrossStep | None = None
 
 
 class Explained(BaseModel):
@@ -655,8 +677,13 @@ def explain(
     tfidf: TfidfModel | None = None,
     encoder: Encoder | None = None,
     thresholds: Thresholds | None = None,
+    cross: object | None = None,
+    cross_words: bool = False,
 ) -> Explained:
-    """``analyze()`` plus a step-by-step trace whose numbers are checked against the report."""
+    """``analyze()`` plus a step-by-step trace whose numbers are checked against the report.
+
+    ``cross`` is the optional phase-2 cross-encoder; its result is a separate second opinion.
+    """
     model = tfidf or tfidf_mod.load()
     th = thresholds or Thresholds.load()
     report = analyze(inp, tfidf=model, encoder=encoder, thresholds=th)
@@ -722,4 +749,37 @@ def explain(
             encoder_key=th.encoder,
         ),
     )
+    if cross is not None and change:
+        trace.cross = _cross_step(cross, inp, cross_words)
     return Explained(report=report, trace=trace)
+
+
+def _cross_step(model, inp: AnalysisInput, with_words: bool) -> CrossStep | None:
+    from spequlator.models.base import EncoderUnavailable
+    from spequlator.models.cross_encoder import score, word_importance
+
+    try:
+        if with_words:
+            base, weights, n = word_importance(model, inp.documentation, inp.old_code, inp.new_code)
+        else:
+            base, weights, n = score(model, inp.documentation, inp.old_code, inp.new_code), [], 0
+    except EncoderUnavailable:
+        return None
+    doc = inp.documentation
+    ranked = sorted(weights, key=lambda w: w.weight)
+
+    def words(ws):
+        return list(dict.fromkeys(doc[w.start : w.end].strip(".,:;()`'\"") for w in ws))[:5]
+
+    return CrossStep(
+        model=model.name,
+        input_format=model.fmt,
+        max_len=getattr(model, "max_len", 512),
+        score=base,
+        lean="fits" if base >= 0 else "stale",
+        words=[CrossWord(start=w.start, end=w.end, weight=w.weight) for w in weights],
+        n_words=n,
+        passes=n + 1,
+        toward_stale=words([w for w in ranked if w.weight < 0]),
+        toward_fits=words([w for w in reversed(ranked) if w.weight > 0]),
+    )
