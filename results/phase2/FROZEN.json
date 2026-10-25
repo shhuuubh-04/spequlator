@@ -1,0 +1,56 @@
+{
+  "frozen_at": "2026-10-25T19:04:05+00:00",
+  "manifest_sha256": "2dc219a2045364ccaca75607c035ad246a87d680138eaa5aae8b97cbd31ff4a9",
+  "artifacts_sha256": {
+    "minilm-ft2": "a9fcd0ec5edb288d5ff94bc93af514b726a2c57b0bc3e15da23223639f868f2e",
+    "ce": "f169fb296cbe99de970d6c86fe2e32bbe6f4f2de2dc73605b39723c8b1bdc23f",
+    "signals_train_minilm-ft2.parquet": "ee9f0bae0a87149477e448107446f34b0de87bab9bc706b6348da0de88153275",
+    "signals_train_ce.parquet": "344fd619dc5cc813d1eb5c94b035d6de964a8fa27a43baa4da727d0999eb3acc"
+  },
+  "best_bi": {
+    "name": "bi lr5e-05 ep3 len256",
+    "family": "bi-encoder",
+    "lr": 5e-05,
+    "epochs": 3,
+    "max_len": 256,
+    "batch": 8,
+    "hard_neg": true,
+    "seconds": 56,
+    "pairwise_accuracy": 0.7465,
+    "pairwise_accuracy_ci": [
+      0.695,
+      0.803
+    ],
+    "pooled_auc": 0.6932,
+    "pooled_auc_ci": [
+      0.669,
+      0.7252
+    ]
+  },
+  "best_ce": {
+    "name": "ce ms-marco-MiniLM-L6 diff",
+    "family": "cross-encoder",
+    "base": "cross-encoder/ms-marco-MiniLM-L6-v2",
+    "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a",
+    "format": "diff",
+    "epochs": 3,
+    "max_len": 512,
+    "seconds": 87,
+    "pairwise_accuracy": 0.6074,
+    "pairwise_accuracy_ci": [
+      0.5424,
+      0.6724
+    ],
+    "pooled_auc": 0.5317,
+    "pooled_auc_ci": [
+      0.5122,
+      0.5498
+    ]
+  },
+  "combine": {
+    "scale_tfidf": 0.09079770216729176,
+    "scale_ft2": 0.08955168024068452,
+    "centre_ce": 0.09124273806810379,
+    "scale_ce": 0.2769506573677063
+  }
+}
