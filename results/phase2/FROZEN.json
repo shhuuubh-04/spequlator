@@ -1,56 +1,58 @@
 {
-  "frozen_at": "2026-10-26T03:35:26+00:00",
-  "manifest_sha256": "f7defe77318fc9acd449120c665f1e94bb1706b8f32c5501cc61b0530e8b06a8",
+  "frozen_at": "2026-10-26T12:26:59+00:00",
+  "run": 3,
+  "manifest_sha256": "f08ded9ab8d056e9649cdbac6543ec05da0c7c122d364daea6a3c6aa1edfff49",
   "artifacts_sha256": {
-    "minilm-ft2": "03d839322028a004fec7fe21802108100a3bf4d4004bf0179f41035adfcb0131",
-    "ce": "e04b8992cdbf3a892c5887b370da944ff349575c9b66969bda2a0613968e4420",
-    "signals_train_minilm-ft2.parquet": "5d58f09fd736c8483a015c53414b5e57d9da7c4c495ace1e898b5a6c4a54f937",
-    "signals_train_ce.parquet": "7ff991527fb30a4d6d5436f0db9b76716d42ba9a9368b5a3d7fed59eda5255b1"
+    "minilm-ft2": "c6dfe4c89b4871b1b44aa3e9dd58d98227191c989458b6c5e5bee4e70e2e33c0",
+    "signals_train_minilm-ft2.parquet": "8b0b8bdf622c77ce6943303715cbce4a6cff9791ed69f49c9def452176207486",
+    "granite-ft": "884ae0f494dc05af2861dac76d5425524d8ca32aab4f8490ca932bdb07856d84",
+    "signals_train_granite-ft.parquet": "79fb6ef673fc1cdc42a4c50377f0f09985d729d982a8792c3ab85e2124d44585"
   },
   "best_bi": {
-    "name": "bi lr5e-05 ep3 len256",
-    "family": "bi-encoder",
-    "lr": 5e-05,
-    "epochs": 3,
+    "name": "minilm c6 (mean of 3 seeds)",
+    "family": "minilm-mean",
+    "base": "minilm",
+    "config": 6,
     "max_len": 256,
-    "batch": 8,
-    "hard_neg": true,
-    "seconds": 56,
-    "pairwise_accuracy": 0.7465,
-    "pairwise_accuracy_ci": [
-      0.695,
-      0.803
-    ],
-    "pooled_auc": 0.6933,
-    "pooled_auc_ci": [
-      0.6692,
-      0.7253
+    "lr": 8e-05,
+    "epochs": 4,
+    "batch": 16,
+    "warmup": 0.1,
+    "wd": 0.01,
+    "scale": 20.0,
+    "pairwise_accuracy": 0.7485,
+    "pooled_auc": 0.6911,
+    "pooled_auc_sd": 0.0049,
+    "pooled_auc_by_seed": [
+      0.688,
+      0.698,
+      0.6872
     ]
   },
-  "best_ce": {
-    "name": "ce ms-marco-MiniLM-L6 diff",
-    "family": "cross-encoder",
-    "base": "cross-encoder/ms-marco-MiniLM-L6-v2",
-    "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a",
-    "format": "diff",
-    "epochs": 3,
-    "max_len": 512,
-    "seconds": 89,
-    "pairwise_accuracy": 0.6312,
-    "pairwise_accuracy_ci": [
-      0.5805,
-      0.6953
-    ],
-    "pooled_auc": 0.5303,
-    "pooled_auc_ci": [
-      0.5149,
-      0.558
+  "best_granite": {
+    "name": "granite c3 (mean of 3 seeds)",
+    "family": "granite-mean",
+    "base": "granite",
+    "config": 3,
+    "max_len": 256,
+    "lr": 5e-05,
+    "epochs": 2,
+    "batch": 16,
+    "warmup": 0.05,
+    "wd": 0.01,
+    "scale": 30.0,
+    "pairwise_accuracy": 0.7558,
+    "pooled_auc": 0.7118,
+    "pooled_auc_sd": 0.0016,
+    "pooled_auc_by_seed": [
+      0.7097,
+      0.7136,
+      0.712
     ]
   },
   "combine": {
     "scale_tfidf": 0.09079770216729176,
-    "scale_ft2": 0.08954992457176701,
-    "centre_ce": -0.12150055170059204,
-    "scale_ce": 2.1187825202941895
+    "scale_ft2": 0.08767904967197604,
+    "scale_granite": 0.035941802431723735
   }
 }
