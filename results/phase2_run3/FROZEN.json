@@ -1,0 +1,58 @@
+{
+  "frozen_at": "2026-10-26T12:26:59+00:00",
+  "run": 3,
+  "manifest_sha256": "f08ded9ab8d056e9649cdbac6543ec05da0c7c122d364daea6a3c6aa1edfff49",
+  "artifacts_sha256": {
+    "minilm-ft2": "c6dfe4c89b4871b1b44aa3e9dd58d98227191c989458b6c5e5bee4e70e2e33c0",
+    "signals_train_minilm-ft2.parquet": "8b0b8bdf622c77ce6943303715cbce4a6cff9791ed69f49c9def452176207486",
+    "granite-ft": "884ae0f494dc05af2861dac76d5425524d8ca32aab4f8490ca932bdb07856d84",
+    "signals_train_granite-ft.parquet": "79fb6ef673fc1cdc42a4c50377f0f09985d729d982a8792c3ab85e2124d44585"
+  },
+  "best_bi": {
+    "name": "minilm c6 (mean of 3 seeds)",
+    "family": "minilm-mean",
+    "base": "minilm",
+    "config": 6,
+    "max_len": 256,
+    "lr": 8e-05,
+    "epochs": 4,
+    "batch": 16,
+    "warmup": 0.1,
+    "wd": 0.01,
+    "scale": 20.0,
+    "pairwise_accuracy": 0.7485,
+    "pooled_auc": 0.6911,
+    "pooled_auc_sd": 0.0049,
+    "pooled_auc_by_seed": [
+      0.688,
+      0.698,
+      0.6872
+    ]
+  },
+  "best_granite": {
+    "name": "granite c3 (mean of 3 seeds)",
+    "family": "granite-mean",
+    "base": "granite",
+    "config": 3,
+    "max_len": 256,
+    "lr": 5e-05,
+    "epochs": 2,
+    "batch": 16,
+    "warmup": 0.05,
+    "wd": 0.01,
+    "scale": 30.0,
+    "pairwise_accuracy": 0.7558,
+    "pooled_auc": 0.7118,
+    "pooled_auc_sd": 0.0016,
+    "pooled_auc_by_seed": [
+      0.7097,
+      0.7136,
+      0.712
+    ]
+  },
+  "combine": {
+    "scale_tfidf": 0.09079770216729176,
+    "scale_ft2": 0.08767904967197604,
+    "scale_granite": 0.035941802431723735
+  }
+}
