@@ -1,11 +1,11 @@
 {
-  "frozen_at": "2026-10-25T19:04:05+00:00",
-  "manifest_sha256": "2dc219a2045364ccaca75607c035ad246a87d680138eaa5aae8b97cbd31ff4a9",
+  "frozen_at": "2026-10-26T03:35:26+00:00",
+  "manifest_sha256": "f7defe77318fc9acd449120c665f1e94bb1706b8f32c5501cc61b0530e8b06a8",
   "artifacts_sha256": {
-    "minilm-ft2": "a9fcd0ec5edb288d5ff94bc93af514b726a2c57b0bc3e15da23223639f868f2e",
-    "ce": "f169fb296cbe99de970d6c86fe2e32bbe6f4f2de2dc73605b39723c8b1bdc23f",
-    "signals_train_minilm-ft2.parquet": "ee9f0bae0a87149477e448107446f34b0de87bab9bc706b6348da0de88153275",
-    "signals_train_ce.parquet": "344fd619dc5cc813d1eb5c94b035d6de964a8fa27a43baa4da727d0999eb3acc"
+    "minilm-ft2": "03d839322028a004fec7fe21802108100a3bf4d4004bf0179f41035adfcb0131",
+    "ce": "e04b8992cdbf3a892c5887b370da944ff349575c9b66969bda2a0613968e4420",
+    "signals_train_minilm-ft2.parquet": "5d58f09fd736c8483a015c53414b5e57d9da7c4c495ace1e898b5a6c4a54f937",
+    "signals_train_ce.parquet": "7ff991527fb30a4d6d5436f0db9b76716d42ba9a9368b5a3d7fed59eda5255b1"
   },
   "best_bi": {
     "name": "bi lr5e-05 ep3 len256",
@@ -21,10 +21,10 @@
       0.695,
       0.803
     ],
-    "pooled_auc": 0.6932,
+    "pooled_auc": 0.6933,
     "pooled_auc_ci": [
-      0.669,
-      0.7252
+      0.6692,
+      0.7253
     ]
   },
   "best_ce": {
@@ -35,22 +35,22 @@
     "format": "diff",
     "epochs": 3,
     "max_len": 512,
-    "seconds": 87,
-    "pairwise_accuracy": 0.6074,
+    "seconds": 89,
+    "pairwise_accuracy": 0.6312,
     "pairwise_accuracy_ci": [
-      0.5424,
-      0.6724
+      0.5805,
+      0.6953
     ],
-    "pooled_auc": 0.5317,
+    "pooled_auc": 0.5303,
     "pooled_auc_ci": [
-      0.5122,
-      0.5498
+      0.5149,
+      0.558
     ]
   },
   "combine": {
     "scale_tfidf": 0.09079770216729176,
-    "scale_ft2": 0.08955168024068452,
-    "centre_ce": 0.09124273806810379,
-    "scale_ce": 0.2769506573677063
+    "scale_ft2": 0.08954992457176701,
+    "centre_ce": -0.12150055170059204,
+    "scale_ce": 2.1187825202941895
   }
 }
