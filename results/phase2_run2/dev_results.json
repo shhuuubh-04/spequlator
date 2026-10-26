@@ -1,0 +1,285 @@
+[
+  {
+    "name": "bi pretrained len256",
+    "family": "bi-encoder",
+    "max_len": 256,
+    "fine_tuned": false,
+    "pairwise_accuracy": 0.7147,
+    "pairwise_accuracy_ci": [
+      0.6622,
+      0.7824
+    ],
+    "pooled_auc": 0.6386,
+    "pooled_auc_ci": [
+      0.6181,
+      0.6657
+    ]
+  },
+  {
+    "name": "bi pretrained len384",
+    "family": "bi-encoder",
+    "max_len": 384,
+    "fine_tuned": false,
+    "pairwise_accuracy": 0.7237,
+    "pairwise_accuracy_ci": [
+      0.6726,
+      0.7815
+    ],
+    "pooled_auc": 0.6452,
+    "pooled_auc_ci": [
+      0.6215,
+      0.6717
+    ]
+  },
+  {
+    "name": "bi lr5e-05 ep3 len256",
+    "family": "bi-encoder",
+    "lr": 5e-05,
+    "epochs": 3,
+    "max_len": 256,
+    "batch": 8,
+    "hard_neg": true,
+    "seconds": 56,
+    "pairwise_accuracy": 0.7465,
+    "pairwise_accuracy_ci": [
+      0.695,
+      0.803
+    ],
+    "pooled_auc": 0.6933,
+    "pooled_auc_ci": [
+      0.6692,
+      0.7253
+    ]
+  },
+  {
+    "name": "bi lr5e-05 ep3 len384",
+    "family": "bi-encoder",
+    "lr": 5e-05,
+    "epochs": 3,
+    "max_len": 384,
+    "batch": 8,
+    "hard_neg": true,
+    "seconds": 72,
+    "pairwise_accuracy": 0.7525,
+    "pairwise_accuracy_ci": [
+      0.6979,
+      0.8053
+    ],
+    "pooled_auc": 0.6962,
+    "pooled_auc_ci": [
+      0.6726,
+      0.7282
+    ]
+  },
+  {
+    "name": "bi lr5e-05 ep5 len256",
+    "family": "bi-encoder",
+    "lr": 5e-05,
+    "epochs": 5,
+    "max_len": 256,
+    "batch": 8,
+    "hard_neg": true,
+    "seconds": 89,
+    "pairwise_accuracy": 0.7445,
+    "pairwise_accuracy_ci": [
+      0.7136,
+      0.7837
+    ],
+    "pooled_auc": 0.6899,
+    "pooled_auc_ci": [
+      0.6681,
+      0.7166
+    ]
+  },
+  {
+    "name": "bi lr5e-05 ep5 len384",
+    "family": "bi-encoder",
+    "lr": 5e-05,
+    "epochs": 5,
+    "max_len": 384,
+    "batch": 8,
+    "hard_neg": true,
+    "seconds": 116,
+    "pairwise_accuracy": 0.7465,
+    "pairwise_accuracy_ci": [
+      0.6952,
+      0.7984
+    ],
+    "pooled_auc": 0.6933,
+    "pooled_auc_ci": [
+      0.6737,
+      0.7189
+    ]
+  },
+  {
+    "name": "bi best, no hard negative",
+    "family": "bi-encoder-ablation",
+    "lr": 5e-05,
+    "epochs": 3,
+    "max_len": 256,
+    "hard_neg": false,
+    "pairwise_accuracy": 0.7525,
+    "pairwise_accuracy_ci": [
+      0.6998,
+      0.8272
+    ],
+    "pooled_auc": 0.6664,
+    "pooled_auc_ci": [
+      0.6338,
+      0.7075
+    ]
+  },
+  {
+    "name": "bi best, batch 32",
+    "family": "bi-encoder-ablation",
+    "lr": 5e-05,
+    "epochs": 3,
+    "max_len": 256,
+    "batch": 32,
+    "pairwise_accuracy": 0.7545,
+    "pairwise_accuracy_ci": [
+      0.7062,
+      0.8068
+    ],
+    "pooled_auc": 0.6887,
+    "pooled_auc_ci": [
+      0.6574,
+      0.7273
+    ]
+  },
+  {
+    "name": "bi best, seed 7",
+    "family": "bi-encoder-ablation",
+    "lr": 5e-05,
+    "epochs": 3,
+    "max_len": 256,
+    "seed": 7,
+    "pairwise_accuracy": 0.7525,
+    "pairwise_accuracy_ci": [
+      0.71,
+      0.8023
+    ],
+    "pooled_auc": 0.6825,
+    "pooled_auc_ci": [
+      0.6562,
+      0.7166
+    ]
+  },
+  {
+    "name": "bi best, seed 42",
+    "family": "bi-encoder-ablation",
+    "lr": 5e-05,
+    "epochs": 3,
+    "max_len": 256,
+    "seed": 42,
+    "pairwise_accuracy": 0.7565,
+    "pairwise_accuracy_ci": [
+      0.7158,
+      0.8034
+    ],
+    "pooled_auc": 0.6857,
+    "pooled_auc_ci": [
+      0.6651,
+      0.7119
+    ]
+  },
+  {
+    "name": "ce ms-marco-MiniLM-L6 diff",
+    "family": "cross-encoder",
+    "base": "cross-encoder/ms-marco-MiniLM-L6-v2",
+    "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a",
+    "format": "diff",
+    "epochs": 3,
+    "max_len": 512,
+    "seconds": 89,
+    "pairwise_accuracy": 0.6312,
+    "pairwise_accuracy_ci": [
+      0.5805,
+      0.6953
+    ],
+    "pooled_auc": 0.5303,
+    "pooled_auc_ci": [
+      0.5149,
+      0.558
+    ]
+  },
+  {
+    "name": "ce ms-marco-MiniLM-L6 full",
+    "family": "cross-encoder",
+    "base": "cross-encoder/ms-marco-MiniLM-L6-v2",
+    "revision": "233902d25c440f23af6f7d6e94d2946bac0bee0a",
+    "format": "full",
+    "epochs": 3,
+    "max_len": 512,
+    "seconds": 87,
+    "pairwise_accuracy": 0.6252,
+    "pairwise_accuracy_ci": [
+      0.5983,
+      0.6581
+    ],
+    "pooled_auc": 0.5238,
+    "pooled_auc_ci": [
+      0.5128,
+      0.5428
+    ]
+  },
+  {
+    "name": "ce all-MiniLM-L6 diff",
+    "family": "cross-encoder",
+    "base": "sentence-transformers/all-MiniLM-L6-v2",
+    "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "format": "diff",
+    "epochs": 3,
+    "max_len": 512,
+    "seconds": 87,
+    "pairwise_accuracy": 0.5934,
+    "pairwise_accuracy_ci": [
+      0.5676,
+      0.6328
+    ],
+    "pooled_auc": 0.5283,
+    "pooled_auc_ci": [
+      0.5136,
+      0.5507
+    ]
+  },
+  {
+    "name": "ce all-MiniLM-L6 full",
+    "family": "cross-encoder",
+    "base": "sentence-transformers/all-MiniLM-L6-v2",
+    "revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
+    "format": "full",
+    "epochs": 3,
+    "max_len": 512,
+    "seconds": 87,
+    "pairwise_accuracy": 0.5895,
+    "pairwise_accuracy_ci": [
+      0.5634,
+      0.6247
+    ],
+    "pooled_auc": 0.5205,
+    "pooled_auc_ci": [
+      0.508,
+      0.5338
+    ]
+  },
+  {
+    "name": "ce unixcoder diff (dev only)",
+    "family": "cross-encoder-reference",
+    "base": "microsoft/unixcoder-base",
+    "revision": "5604afdc964f6c53782a6813140ade5216b99006",
+    "format": "diff",
+    "epochs": 3,
+    "max_len": 512,
+    "pairwise_accuracy": 0.6561,
+    "pairwise_accuracy_ci": [
+      0.6138,
+      0.6998
+    ],
+    "pooled_auc": 0.532,
+    "pooled_auc_ci": [
+      0.523,
+      0.5602
+    ]
+  }
+]
