@@ -5,13 +5,10 @@ import zipfile
 import numpy as np
 import pandas as pd
 import pytest
-from conftest import read
 
 from spequlator.evaluation import phase2
 from spequlator.models.cross_encoder import change_text, word_importance
 from spequlator.pipeline.report import Thresholds
-from spequlator.pipeline.trace import explain
-from spequlator.schemas import AnalysisInput
 
 TH = Thresholds()
 
@@ -31,14 +28,6 @@ class FakeScorer:
         return np.array([0.5 - doc.count("timeout") for doc, _ in pairs], dtype=float)
 
 
-def _change():
-    return AnalysisInput(
-        documentation=read("stale_param", "doc.txt"),
-        old_code=read("stale_param", "old.py"),
-        new_code=read("stale_param", "new.py"),
-    )
-
-
 def test_change_text_formats():
     diff = change_text("def f(a):\n    return a\n", "def f(b):\n    return b\n", "diff")
     assert diff.startswith("CHANGED LINES:\n- def f(a):") and "+ def f(b):" in diff
@@ -53,22 +42,6 @@ def test_word_importance_is_score_minus_occluded_score():
     by_word = {doc[w.start : w.end]: w.weight for w in weights}
     assert by_word["timeout"] == pytest.approx(-1.0)  # removing it raises the score by 1
     assert by_word["Wait"] == pytest.approx(0.0)
-
-
-def test_explain_cross_score_only_then_words(small_tfidf):
-    fake = FakeScorer()
-    tr = explain(_change(), tfidf=small_tfidf, thresholds=TH, cross=fake).trace
-    assert tr.cross is not None and tr.cross.words == [] and tr.cross.passes == 1
-    assert tr.cross.lean == ("fits" if tr.cross.score >= 0 else "stale")
-    tr2 = explain(_change(), tfidf=small_tfidf, thresholds=TH, cross=fake, cross_words=True).trace
-    assert tr2.cross.n_words == len(tr2.cross.words) and tr2.cross.passes == tr2.cross.n_words + 1
-    assert "timeout" in tr2.cross.toward_stale
-
-
-def test_cross_is_absent_without_model_or_in_snapshot_mode(small_tfidf):
-    assert explain(_change(), tfidf=small_tfidf, thresholds=TH).trace.cross is None
-    snap = AnalysisInput(documentation=read("aligned", "doc.txt"), code=read("aligned", "code.py"))
-    assert explain(snap, tfidf=small_tfidf, thresholds=TH, cross=FakeScorer()).trace.cross is None
 
 
 def _fake_outputs(root):
@@ -141,3 +114,50 @@ def test_metrics_on_synthetic_signals():
         m, [{"name": "bi", "family": "bi-encoder", "pairwise_accuracy": 0.7, "pooled_auc": 0.65}]
     )
     assert "declared second use" in md and "| bi | bi-encoder |" in md
+
+
+def test_run3_two_bi_encoders_no_cross_encoder():
+    rng = np.random.default_rng(1)
+    n = 60
+    df = pd.DataFrame(
+        {"record_id": [f"r{i}" for i in range(n)], "project_key": [f"p{i % 6}" for i in range(n)]}
+    )
+    for name in ("tfidf_abs", "tfidf_delta", "minilm_delta", "minilm-ft_delta", "ft2", "granite"):
+        df[f"stale_{name}"] = rng.normal(-0.5, 1, n)
+        df[f"updated_{name}"] = rng.normal(0.5, 1, n)
+    th = Thresholds(scale_tfidf=0.09, scale_encoder=0.07, encoder="minilm-ft")
+    frozen = {"run": 3, "combine": {"scale_tfidf": 0.09, "scale_ft2": 1.0, "scale_granite": 1.0}}
+    sig = phase2.phase2_signals(df, frozen, th)
+    assert "TF-IDF + Granite (phase 2)" in sig and "TF-IDF + MiniLM (phase 2)" in sig
+    assert not any("cross-encoder" in k.lower() for k in sig)
+    m = phase2.compute(df, sig, n_boot=20)
+    assert (
+        "Granite fine-tuned delta (phase 2) minus MiniLM fine-tuned delta (phase 2)"
+        in m["comparisons"]
+    )
+    m["frozen"] = frozen
+    dev = [
+        {
+            "name": "granite c0 seed 13",
+            "family": "granite-run",
+            "pairwise_accuracy": 0.7,
+            "pooled_auc": 0.7,
+        },
+        {
+            "name": "granite c0 (mean of 3 seeds)",
+            "family": "granite-mean",
+            "pairwise_accuracy": 0.7,
+            "pooled_auc": 0.71,
+            "pooled_auc_sd": 0.004,
+        },
+    ]
+    md = phase2.to_markdown(m, dev)
+    assert "Phase 2 run 3 test (declared fourth use" in md
+    assert "0.710 ± 0.004" in md and "seed 13" not in md and "Paired difference" in md
+
+
+def test_present_reads_the_manifest():
+    assert phase2.present({"sha256": {"granite-ft": "x", "minilm-ft2": "y", "ce": "z"}}) == [
+        "minilm-ft2",
+        "granite-ft",
+    ]

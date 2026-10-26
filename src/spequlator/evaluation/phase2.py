@@ -6,7 +6,9 @@
   uv run python -m spequlator.evaluation.phase2 run --confirm-frozen
 
 v1.0's frozen artifacts and results are never modified. The new models are compared with
-v1 on the same test split; this is the test split's second, declared use.
+v1 on the same test split; each phase-2 run is a declared reuse of it (run 1 = second use).
+Run 3 has two fine-tuned bi-encoders (MiniLM, Granite Small R2) and no cross-encoder; runs 1-2
+also had a cross-encoder. Whatever the manifest lists is what gets frozen and scored.
 """
 
 from __future__ import annotations
@@ -38,6 +40,33 @@ from spequlator.paths import artifacts_dir
 from spequlator.pipeline.report import Thresholds
 
 V1_COMBINED = "v1 combined (TF-IDF + MiniLM-ft)"
+
+# artifact folder -> (manifest key of its pick, column suffix, signal name, with-TF-IDF name)
+ENCODERS = {
+    "minilm-ft2": (
+        "best_bi",
+        "ft2",
+        "MiniLM fine-tuned delta (phase 2)",
+        "TF-IDF + MiniLM (phase 2)",
+    ),
+    "granite-ft": (
+        "best_granite",
+        "granite",
+        "Granite fine-tuned delta (phase 2)",
+        "TF-IDF + Granite (phase 2)",
+    ),
+}
+# Extra paired comparisons reported when both signals exist (a minus b).
+COMPARISONS = [
+    ("Granite fine-tuned delta (phase 2)", "MiniLM fine-tuned delta (phase 2)"),
+    ("TF-IDF + Granite (phase 2)", "TF-IDF + MiniLM (phase 2)"),
+]
+ORDINAL = {1: "second", 2: "third", 3: "fourth", 4: "fifth"}
+
+
+def present(manifest: dict) -> list[str]:
+    """Bi-encoder artifact folders this manifest contains."""
+    return [k for k in ENCODERS if k in manifest["sha256"]]
 
 
 def p2_dir() -> Path:
@@ -84,26 +113,26 @@ def freeze() -> Path:
     manifest = verify_manifest(p2_dir())
     if manifest.get("smoke"):
         raise Phase2Error("these outputs come from a smoke run; run the full notebook")
-    ft2 = pd.read_parquet(p2_dir() / "signals_train_minilm-ft2.parquet")
-    ce = pd.read_parquet(p2_dir() / "signals_train_ce.parquet")
-    ft2_all = np.r_[ft2["stale_enc_delta"], ft2["updated_enc_delta"]]
-    ce_all = np.r_[ce["stale_ce"], ce["updated_ce"]]
     th = Thresholds.load()
+    # Combination (pre-registered): each signal / its spread on cross-fitted train rows;
+    # a cross-encoder logit is centred on its train mean first (Δ signals are already
+    # centred at "no change"). TF-IDF keeps v1's frozen scale.
+    combine = {"scale_tfidf": th.scale_tfidf}
+    for key in present(manifest):
+        col = ENCODERS[key][1]
+        sig = pd.read_parquet(p2_dir() / f"signals_train_{key}.parquet")
+        combine[f"scale_{col}"] = _scale(np.r_[sig["stale_enc_delta"], sig["updated_enc_delta"]])
+    if "ce" in manifest["sha256"]:
+        ce = pd.read_parquet(p2_dir() / "signals_train_ce.parquet")
+        ce_all = np.r_[ce["stale_ce"], ce["updated_ce"]]
+        combine["centre_ce"], combine["scale_ce"] = float(np.mean(ce_all)), _scale(ce_all)
     record = {
         "frozen_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "run": manifest.get("run", 1),
         "manifest_sha256": _sha256(p2_dir() / "phase2_manifest.json"),
         "artifacts_sha256": manifest["sha256"],
-        "best_bi": manifest["best_bi"],
-        "best_ce": manifest["best_ce"],
-        # Combination (pre-registered): each signal / its spread on cross-fitted train rows;
-        # the cross-encoder logit is centred on its train mean first (Δ signals are already
-        # centred at "no change"). TF-IDF keeps v1's frozen scale.
-        "combine": {
-            "scale_tfidf": th.scale_tfidf,
-            "scale_ft2": _scale(ft2_all),
-            "centre_ce": float(np.mean(ce_all)),
-            "scale_ce": _scale(ce_all),
-        },
+        **{k: manifest[k] for k in ("best_bi", "best_granite", "best_ce") if k in manifest},
+        "combine": combine,
     }
     out = out_dir()
     out.mkdir(parents=True, exist_ok=True)
@@ -114,20 +143,28 @@ def freeze() -> Path:
 
 
 def _test_signals() -> pd.DataFrame:
-    """v1 test caches plus the two phase-2 models (cached under artifacts/phase2)."""
-    from spequlator.models.cross_encoder import CrossModel, change_text
+    """v1 test caches plus the phase-2 models (cached under artifacts/phase2)."""
     from spequlator.models.encoder import EncoderSpec, SentenceEncoder
 
+    manifest = json.loads((p2_dir() / "phase2_manifest.json").read_text())
     df = load_frame("test")
     recs = {r.record_id: r for r in load_split("test")}
     ordered = [recs[i] for i in df["record_id"]]
+    df = df.set_index("record_id")
 
-    ft2_cache = p2_dir() / "signals_test_minilm-ft2.parquet"
-    if not ft2_cache.exists():
-        best = json.loads((p2_dir() / "phase2_manifest.json").read_text())["best_bi"]
-        spec = EncoderSpec("minilm-ft2", str(p2_dir() / "minilm-ft2"), None, int(best["max_len"]))
-        encoder_signals(ordered, SentenceEncoder(spec, batch_size=32)).to_parquet(ft2_cache)
-    ft2 = pd.read_parquet(ft2_cache).set_index("record_id")
+    for key in present(manifest):
+        best_key, col = ENCODERS[key][:2]
+        cache = p2_dir() / f"signals_test_{key}.parquet"
+        if not cache.exists():
+            print(f"encoding the test split with {key} (a few minutes on CPU)...", file=sys.stderr)
+            spec = EncoderSpec(key, str(p2_dir() / key), None, int(manifest[best_key]["max_len"]))
+            encoder_signals(ordered, SentenceEncoder(spec, batch_size=32)).to_parquet(cache)
+        sig = pd.read_parquet(cache).set_index("record_id")
+        df[f"stale_{col}"], df[f"updated_{col}"] = sig["stale_enc_delta"], sig["updated_enc_delta"]
+
+    if "ce" not in manifest["sha256"]:
+        return df.reset_index()
+    from spequlator.models.cross_encoder import CrossModel, change_text
 
     ce_cache = p2_dir() / "signals_test_ce.parquet"
     if not ce_cache.exists():
@@ -139,9 +176,6 @@ def _test_signals() -> pd.DataFrame:
             {"record_id": [r.record_id for r in ordered], "stale_ce": stale, "updated_ce": upd}
         ).to_parquet(ce_cache)
     ce = pd.read_parquet(ce_cache).set_index("record_id")
-
-    df = df.set_index("record_id")
-    df["stale_ft2"], df["updated_ft2"] = ft2["stale_enc_delta"], ft2["updated_enc_delta"]
     df["stale_ce"], df["updated_ce"] = ce["stale_ce"], ce["updated_ce"]
     return df.reset_index()
 
@@ -154,28 +188,36 @@ def phase2_signals(df: pd.DataFrame, frozen: dict, th: Thresholds) -> dict:
     def t(p):
         return df[f"{p}_tfidf_delta"].to_numpy() / c["scale_tfidf"]
 
-    def f(p):
-        return df[f"{p}_ft2"].to_numpy() / c["scale_ft2"]
+    def enc(col, p):
+        return df[f"{p}_{col}"].to_numpy() / c[f"scale_{col}"]
 
     def x(p):
         return (df[f"{p}_ce"].to_numpy() - c["centre_ce"]) / c["scale_ce"]
 
     v1_comb = next(k for k in v1 if k.startswith("Combined"))
-    return {
+    out = {
         BASELINE: v1[BASELINE],
         "MiniLM fine-tuned delta (v1)": v1["MiniLM fine-tuned delta"],
         V1_COMBINED: v1[v1_comb],
-        "MiniLM fine-tuned delta (phase 2)": tuple(df[f"{p}_ft2"].to_numpy() for p in pair),
-        "Cross-encoder (phase 2)": tuple(df[f"{p}_ce"].to_numpy() for p in pair),
-        "TF-IDF + MiniLM (phase 2)": tuple((t(p) + f(p)) / 2 for p in pair),
-        "TF-IDF + cross-encoder": tuple((t(p) + x(p)) / 2 for p in pair),
-        "TF-IDF + MiniLM (phase 2) + cross-encoder": tuple((t(p) + f(p) + x(p)) / 3 for p in pair),
     }
+    cols = [v for v in ENCODERS.values() if f"scale_{v[1]}" in c]
+    for _, col, name, _ in cols:
+        out[name] = tuple(df[f"{p}_{col}"].to_numpy() for p in pair)
+    for _, col, _, combo in cols:
+        out[combo] = tuple((t(p) + enc(col, p)) / 2 for p in pair)
+    if "scale_ce" in c:
+        out["Cross-encoder (phase 2)"] = tuple(df[f"{p}_ce"].to_numpy() for p in pair)
+        out["TF-IDF + cross-encoder"] = tuple((t(p) + x(p)) / 2 for p in pair)
+        if "scale_ft2" in c:
+            out["TF-IDF + MiniLM (phase 2) + cross-encoder"] = tuple(
+                (t(p) + enc("ft2", p) + x(p)) / 3 for p in pair
+            )
+    return out
 
 
 def compute(df: pd.DataFrame, sig: dict, n_boot: int = stats.N_BOOT) -> dict:
     groups = df["project_key"].to_numpy()
-    out: dict = {"n_records": len(df), "n_projects": len(np.unique(groups)), "signals": {}}
+    out: dict = {"n_records": len(df), "n_projects": int(len(np.unique(groups))), "signals": {}}
     for name, (s, u) in sig.items():
         row = {}
         for metric in ("pairwise_accuracy", "pooled_auc"):
@@ -196,6 +238,20 @@ def compute(df: pd.DataFrame, sig: dict, n_boot: int = stats.N_BOOT) -> dict:
                 key = "tfidf" if ref == BASELINE else "v1"
                 row[f"{metric}_minus_{key}"] = {"value": d, "ci95": [dlo, dhi]}
         out["signals"][name] = row
+    for a, b in COMPARISONS:
+        if a not in sig or b not in sig:
+            continue
+        (s, u), (rs, ru) = sig[a], sig[b]
+        row = {}
+        for metric in ("pairwise_accuracy", "pooled_auc"):
+            fn = getattr(stats, metric)
+            d, dlo, dhi = stats.cluster_bootstrap(
+                groups,
+                lambda i, s=s, u=u, rs=rs, ru=ru, fn=fn: fn(s[i], u[i]) - fn(rs[i], ru[i]),
+                n_boot,
+            )
+            row[metric] = {"value": d, "ci95": [dlo, dhi]}
+        out.setdefault("comparisons", {})[f"{a} minus {b}"] = row
     return out
 
 
@@ -206,11 +262,19 @@ def _cell(c: dict | None) -> str:
     return f"{c['value']:.3f} [{lo:.3f}, {hi:.3f}]"
 
 
+def _dev_auc(r: dict) -> str:
+    sd = r.get("pooled_auc_sd")
+    return f"{r['pooled_auc']:.3f}" + (f" ± {sd:.3f}" if sd is not None else "")
+
+
 def to_markdown(m: dict, dev: list[dict]) -> str:
+    run = m.get("frozen", {}).get("run", 1)
+    use = ORDINAL.get(run, f"{run + 1}th")
     lines = [
         (
-            f"Phase 2 test run (declared second use of the test split): {m['n_records']} records, "
-            f"{m['n_projects']} projects; 95% project-cluster bootstrap CIs."
+            f"Phase 2 run {run} test (declared {use} use of the test split): "
+            f"{m['n_records']} records, {m['n_projects']} projects; "
+            "95% project-cluster bootstrap CIs."
         ),
         "",
         "| Signal | Pairwise acc. | Pooled AUC | PA minus v1 combined | AUC minus TF-IDF |",
@@ -221,16 +285,26 @@ def to_markdown(m: dict, dev: list[dict]) -> str:
             f"| {name} | {_cell(r['pairwise_accuracy'])} | {_cell(r['pooled_auc'])} | "
             f"{_cell(r.get('pairwise_accuracy_minus_v1'))} | {_cell(r.get('pooled_auc_minus_tfidf'))} |"
         )
+    if m.get("comparisons"):
+        lines += ["", "| Paired difference | Pairwise acc. | Pooled AUC |", "|---|---|---|"]
+        lines += [
+            f"| {k} | {_cell(r['pairwise_accuracy'])} | {_cell(r['pooled_auc'])} |"
+            for k, r in m["comparisons"].items()
+        ]
     lines += [
         "",
-        "Training-split selection (held-out dev projects, from the Kaggle notebook):",
+        (
+            "Training-split selection (held-out dev projects, from the Kaggle notebook; "
+            "± = spread over seeds; single-seed rows are in dev_results.json):"
+        ),
         "",
         "| Run | Family | Dev pairwise acc. | Dev AUC |",
         "|---|---|---|---|",
     ]
     lines += [
-        f"| {r['name']} | {r['family']} | {r['pairwise_accuracy']:.3f} | {r['pooled_auc']:.3f} |"
+        f"| {r['name']} | {r['family']} | {r['pairwise_accuracy']:.3f} | {_dev_auc(r)} |"
         for r in dev
+        if not r["family"].endswith("-run")
     ]
     return "\n".join(lines) + "\n"
 
@@ -270,19 +344,15 @@ def main(argv: list[str] | None = None) -> int:
         if a.cmd == "import":
             m = import_outputs(a.zip)
             print(f"imported -> {p2_dir()}")
-            print(
-                f"best bi-encoder: {m['best_bi']['name']}  (dev AUC {m['best_bi']['pooled_auc']})"
-            )
-            print(
-                f"best cross-encoder: {m['best_ce']['name']}  (dev AUC {m['best_ce']['pooled_auc']})"
-            )
+            print(f"best MiniLM: {m['best_bi']['name']}  (dev AUC {m['best_bi']['pooled_auc']})")
+            for key, label in (("best_granite", "Granite"), ("best_ce", "cross-encoder")):
+                if key in m:
+                    print(f"best {label}: {m[key]['name']}  (dev AUC {m[key]['pooled_auc']})")
             if m.get("smoke"):
                 print("warning: these are smoke-run outputs, not the real models")
         elif a.cmd == "freeze":
             print(f"frozen -> {freeze()}")
-            print(
-                'next: git add results/phase2 && git commit -m "phase 2: freeze" && git tag phase2-frozen'
-            )
+            print("next: commit results/phase2 and tag the freeze before `run`")
         else:
             print(run(a.confirm_frozen))
     except (Phase2Error, FileNotFoundError) as exc:
