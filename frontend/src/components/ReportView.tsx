@@ -203,7 +203,7 @@ export function ReportView({
       </section>
 
       {report.mode === "change" && trace.encoder.status === "ok" && (
-        <section aria-labelledby="h-words">
+        <section aria-labelledby="h-words" className={trace.words ? undefined : "no-print"}>
           <h2 id="h-words">Which words moved the meaning score</h2>
           <MeaningWords words={trace.words} documentation={trace.documentation} onExplainWords={onExplainWords} busy={busy} />
         </section>

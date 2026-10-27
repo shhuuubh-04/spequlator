@@ -206,3 +206,9 @@ def test_word_importance_needs_an_encoder_and_change_mode(small_tfidf):
     snap = AnalysisInput(documentation=read("aligned", "doc.txt"), code=read("aligned", "code.py"))
     tr = explain(snap, tfidf=small_tfidf, encoder=WordEncoder(), thresholds=CAL, words=True).trace
     assert tr.words is None
+
+
+def test_bpe_pieces_are_shown_readably():
+    from spequlator.pipeline.trace import _piece
+
+    assert _piece("Ġsteps") == "·steps" and _piece("Ċ") == "↵" and _piece("##ing") == "##ing"

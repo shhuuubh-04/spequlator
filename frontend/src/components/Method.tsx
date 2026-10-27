@@ -371,7 +371,11 @@ export function Method({ data }: { data: Explained }) {
                     {p}
                   </span>
                 ))}
-                <span className="muted"> first sub-word tokens of the documentation</span>
+                <span className="muted">
+                  {" "}
+                  first sub-word tokens of the documentation
+                  {e.texts[0].pieces.some((p) => p.includes("·") || p.includes("↵")) ? " (· starts a new word, ↵ is a line break)" : ""}
+                </span>
               </p>
             )}
             <ul className="formulas">

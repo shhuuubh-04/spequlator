@@ -419,7 +419,7 @@ def _encoder_step(
             try:
                 n_tok = len(tok([text], add_special_tokens=True, verbose=False)["input_ids"][0])
                 if hasattr(tok, "tokenize"):
-                    pieces = [str(p) for p in tok.tokenize(text)[:PIECE_PREVIEW]]
+                    pieces = [_piece(str(p)) for p in tok.tokenize(text)[:PIECE_PREVIEW]]
             except Exception:  # noqa: BLE001 - display-only detail; the signal is already checked
                 n_tok, pieces = None, []
         out.append(
@@ -752,6 +752,11 @@ def explain(
 
 _DOC_WORD = re.compile(r"\S+")  # whitespace-separated words, as a reader sees them
 MAX_WORDS = 80
+
+
+def _piece(p: str) -> str:
+    """Readable sub-word token: byte-level BPE markers (Granite) become · (new word) and ↵."""
+    return p.replace("Ġ", "·").replace("Ċ", "↵").replace("ĉ", "⇥")
 
 
 def _words_step(encoder: Encoder, inp: AnalysisInput, model: str) -> WordsStep:
