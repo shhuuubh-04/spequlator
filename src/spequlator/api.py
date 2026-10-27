@@ -33,8 +33,6 @@ _state: dict = {
     "encoder": None,
     "encoder_status": "disabled",
     "encoder_name": None,
-    "cross": None,
-    "cross_status": "absent",
 }
 
 
@@ -49,29 +47,12 @@ def _warm_encoder(key: str) -> None:
         _state.update(encoder=None, encoder_status="unavailable")
 
 
-def _warm_cross() -> None:
-    """Phase-2 cross-encoder (D-032), only if `phase2 import` has been run."""
-    from spequlator.models.cross_encoder import get_cross_model
-
-    try:
-        model = get_cross_model()
-        model.score_pairs([("warm-up", "warm-up")])
-        _state.update(cross=model, cross_status="ready")
-    except EncoderUnavailable:
-        _state.update(cross=None, cross_status="absent")
-
-
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    key = Thresholds.load().encoder
+    key = Thresholds.active().encoder
     if key:
         _state.update(encoder_status="loading")
         threading.Thread(target=_warm_encoder, args=(key,), daemon=True).start()
-    from spequlator.paths import artifacts_dir
-
-    if (artifacts_dir() / "phase2" / "ce" / "spequlator_ce.json").exists():
-        _state.update(cross_status="loading")
-        threading.Thread(target=_warm_cross, daemon=True).start()
     yield
 
 
@@ -128,7 +109,7 @@ class AnalyzeRequest(BaseModel):
     old_code: str | None = Field(default=None, max_length=MAX_CHARS)
     new_code: str | None = Field(default=None, max_length=MAX_CHARS)
     use_encoder: bool = True
-    cross_words: bool = False  # phase-2 word-importance heatmap (one model pass per word)
+    words: bool = False  # word-importance heatmap: one encoder pass per docstring word
 
 
 class ExampleRequest(BaseModel):
@@ -137,20 +118,20 @@ class ExampleRequest(BaseModel):
     record_id: str
     doc_version: Literal["old", "new"] = "old"
     use_encoder: bool = True
-    cross_words: bool = False
+    words: bool = False
 
 
 def _run(inp: AnalysisInput, use_encoder: bool) -> Report:
     from spequlator.pipeline.analyze import analyze
 
     encoder = _state["encoder"] if use_encoder else None
-    report = analyze(inp, encoder=encoder, thresholds=Thresholds.load())
+    report = analyze(inp, encoder=encoder, thresholds=Thresholds.active())
     if use_encoder and encoder is None and _state["encoder_status"] == "loading":
         report.uncertainties.append("The deep-learning model is still loading; try again shortly.")
     return report
 
 
-def _explain(inp: AnalysisInput, use_encoder: bool, cross_words: bool = False) -> Explained:
+def _explain(inp: AnalysisInput, use_encoder: bool, words: bool = False) -> Explained:
     """Report plus the read-only step-by-step trace for the UI (D-030)."""
     from spequlator.pipeline.trace import explain
 
@@ -158,9 +139,8 @@ def _explain(inp: AnalysisInput, use_encoder: bool, cross_words: bool = False) -
     ex = explain(
         inp,
         encoder=encoder,
-        thresholds=Thresholds.load(),
-        cross=_state["cross"],
-        cross_words=cross_words,
+        thresholds=Thresholds.active(),
+        words=words,
     )
     if use_encoder and encoder is None and _state["encoder_status"] == "loading":
         ex.report.uncertainties.append(
@@ -180,14 +160,13 @@ def health() -> dict:
         tfidf_ok = bool(tfidf_mod.load())
     except (tfidf_mod.ArtifactMissing, tfidf_mod.SplitLeakError):
         tfidf_ok = False
-    th = Thresholds.load()
+    th = Thresholds.active()
     return {
         "status": "ok" if tfidf_ok else "degraded",
         "tfidf": tfidf_ok,
         "encoder": _state["encoder_status"],
         "encoder_name": _state["encoder_name"],
         "thresholds": th.version,
-        "cross": _state["cross_status"],
     }
 
 
@@ -255,7 +234,7 @@ def analyze_example(req: ExampleRequest):
 @app.post("/api/explain", response_model=Explained)
 def explain_text(req: AnalyzeRequest) -> Explained:
     inp = AnalysisInput(**req.model_dump(include=set(FIELDS)))
-    return _explain(inp, req.use_encoder, req.cross_words)
+    return _explain(inp, req.use_encoder, req.words)
 
 
 @app.post("/api/explain/example", response_model=Explained)
@@ -264,4 +243,4 @@ def explain_example(req: ExampleRequest):
         r = cdb.get_record(req.record_id)
     except cdb.RecordNotFound:
         return _error(404, "not_found", f"unknown example id {req.record_id!r}", "record_id")
-    return _explain(cdb.to_input(r, req.doc_version), req.use_encoder, req.cross_words)
+    return _explain(cdb.to_input(r, req.doc_version), req.use_encoder, req.words)

@@ -39,6 +39,6 @@ export const api = {
   example: (id: string) => request<ExampleDetail>(`/api/examples/${encodeURIComponent(id)}`),
   analyze: (payload: AnalyzePayload) => request<Report>("/api/analyze", json(payload)),
   explain: (payload: AnalyzePayload) => request<Explained>("/api/explain", json(payload)),
-  explainExample: (record_id: string, doc_version: "old" | "new", cross_words = false) =>
-    request<Explained>("/api/explain/example", json({ record_id, doc_version, cross_words })),
+  explainExample: (record_id: string, doc_version: "old" | "new", words = false) =>
+    request<Explained>("/api/explain/example", json({ record_id, doc_version, words })),
 };

@@ -305,10 +305,7 @@ section[aria-labelledby="h-signals"] .table-scroll { border: 0; border-radius: 0
   .specimen, .check, .worked tr { break-inside: avoid; }
 }
 
-/* ---- phase-2 cross-encoder second opinion ----------------------------------------------- */
-.cross-score { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 4px 0 14px; font-size: 0.88rem; }
-.cross-score .finding { margin-bottom: 0; font-size: 0.85rem; padding: 5px 10px; }
-.cross-score .num { font-weight: 600; }
+/* ---- word-importance heatmap (encoder occlusion) ------------------------------------------- */
 pre.heat { line-height: 1.9; }
 .heat-word { border-radius: 4px; padding: 1px 0; }
 pre.heat + .caption, .sets + .caption { margin-top: 10px; }

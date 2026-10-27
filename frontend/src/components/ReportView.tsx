@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FINDING_LABEL, num } from "../format";
 import type { DiffLine, Explained, Note } from "../types";
 import { MarginNotes, Marked, Ticks } from "./Marked";
-import { CrossOpinion } from "./CrossOpinion";
+import { MeaningWords } from "./MeaningWords";
 import { Method } from "./Method";
 
 const DIFF_PREVIEW = 30;
@@ -202,10 +202,10 @@ export function ReportView({
         <Signals data={data} />
       </section>
 
-      {trace.cross && (
-        <section aria-labelledby="h-cross">
-          <h2 id="h-cross">Second opinion: cross-encoder</h2>
-          <CrossOpinion cross={trace.cross} documentation={trace.documentation} onExplainWords={onExplainWords} busy={busy} />
+      {report.mode === "change" && trace.encoder.status === "ok" && (
+        <section aria-labelledby="h-words">
+          <h2 id="h-words">Which words moved the meaning score</h2>
+          <MeaningWords words={trace.words} documentation={trace.documentation} onExplainWords={onExplainWords} busy={busy} />
         </section>
       )}
 

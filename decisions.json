@@ -198,6 +198,18 @@
       "status": "accepted",
       "decision": "Phase 2: train-split-only GPU experiments (MiniLM sweep and ablations, cross-encoder) on Kaggle; import with hash checks; one declared second test run. v1's decision rule and results stay frozen; the cross-encoder is shown as a separate second opinion with an occlusion heatmap.",
       "rationale": "Strengthens the deep-learning part with tuning, ablations and a second architecture, without changing v1's frozen findings. Selection rules are pre-registered in notebooks/phase2_train.ipynb."
+    },
+    {
+      "id": "D-033",
+      "status": "accepted",
+      "decision": "Do not serve the cross-encoder. The report instead shows which docstring words moved the encoder's meaning score (occlusion on the encoder delta, computed on request).",
+      "rationale": "Phase 2 runs 1-2: the cross-encoder raised paired accuracy (+0.029 over v1 in run 2) but not pooled AUC (0.552 alone; no gain when combined), i.e. it compares two versions but cannot judge one docstring, which is the app's job. Run 3 dropped it."
+    },
+    {
+      "id": "D-034",
+      "status": "accepted",
+      "decision": "v2 system for the app and CLI: TF-IDF + fine-tuned Granite Small R2 (phase 2 run 3), promoted with `python -m spequlator.evaluation.v2 promote`. Scales as frozen for run 3; dead-band eps re-chosen with the D-028 rule on train only (503 cross-fitted dev-project records). SPEQULATOR_SYSTEM=v1 runs the frozen v1 system.",
+      "rationale": "Run 3 (pre-registered, 8 settings x 3 seeds per model): Granite beat MiniLM on dev (0.712 vs 0.691 mean AUC) and on test (pooled AUC +0.021 [0.012, 0.030] alone; TF-IDF + Granite 0.734 vs TF-IDF 0.706, +0.028 [0.018, 0.039]). v1's artifacts, thresholds and results are unchanged; evaluation code keeps using v1."
     }
   ],
   "scope": {

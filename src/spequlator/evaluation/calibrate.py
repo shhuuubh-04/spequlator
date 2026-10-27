@@ -68,6 +68,15 @@ def calibrate(df: pd.DataFrame, encoder: str | None) -> tuple[Thresholds, pd.Dat
     if use_enc:
         scale_e = float(pd.concat([df["stale_enc_delta"], df["updated_enc_delta"]]).std()) or 1.0
     base = Thresholds(encoder=encoder, scale_tfidf=scale_t, scale_encoder=scale_e)
+    chosen, table = choose_eps(df, base)
+    return replace(
+        chosen, version=f"calibrated-train-{encoder or 'tfidf'}-{date.today().isoformat()}"
+    ), table
+
+
+def choose_eps(df: pd.DataFrame, base: Thresholds) -> tuple[Thresholds, pd.DataFrame]:
+    """The D-028 eps rule for fixed scales: best balanced accuracy with coverage >= 60%."""
+    use_enc = base.encoder is not None
     z = [
         base.combined(t, e if use_enc else None)
         for pair in PAIRS
@@ -86,9 +95,4 @@ def calibrate(df: pd.DataFrame, encoder: str | None) -> tuple[Thresholds, pd.Dat
         best = ok.sort_values(["balanced_accuracy_decided", "coverage"], ascending=False).iloc[0]
     else:  # constraint unreachable: be as decisive as possible, and say so
         best = table.sort_values("coverage", ascending=False).iloc[0]
-    chosen = replace(
-        base,
-        version=f"calibrated-train-{encoder or 'tfidf'}-{date.today().isoformat()}",
-        eps=float(best["eps"]),
-    )
-    return chosen, table
+    return replace(base, eps=float(best["eps"])), table

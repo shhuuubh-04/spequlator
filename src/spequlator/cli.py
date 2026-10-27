@@ -45,6 +45,7 @@ class EncKey(str, Enum):
     unixcoder = "unixcoder"
     minilm = "minilm"
     minilm_ft = "minilm-ft"
+    granite_ft = "granite-ft"
 
 
 def _fail(code: int, message: str) -> None:
@@ -142,7 +143,7 @@ def analyze(
         code_file, docs_file, docs_text, old_code_file, new_code_file, example_id, doc_version
     )
     try:
-        th = Thresholds.load()
+        th = Thresholds.active()
         key = None if no_encoder else (encoder.value if encoder else th.encoder)
         rep = run(inp, encoder=get_encoder(key) if key else None, thresholds=th)
     except (ArtifactMissing, SplitLeakError, cdb.DataIntegrityError) as exc:

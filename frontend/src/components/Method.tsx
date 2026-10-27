@@ -410,7 +410,9 @@ export function Method({ data }: { data: Explained }) {
             </p>
             <p className="caption">
               The spreads ({num(c.scale_tfidf, 4)} and {num(c.scale_encoder, 4)}) and the undecided band ±{num(c.eps, 4)} were set on the
-              training split only and frozen before testing (decision D-028, settings {trace.constants.thresholds_version}).
+              training split only ({trace.constants.thresholds_version.startsWith("v2")
+                ? "v2: TF-IDF + Granite, decision D-034"
+                : "frozen before testing, decision D-028"}, settings {trace.constants.thresholds_version}).
             </p>
           </>
         ) : (

@@ -1,0 +1,24 @@
+{
+  "promoted_at": "2026-10-27T03:18:29+00:00",
+  "decision": "D-034",
+  "source": "results/phase2_run3/FROZEN.json",
+  "source_manifest_sha256": "f08ded9ab8d056e9649cdbac6543ec05da0c7c122d364daea6a3c6aa1edfff49",
+  "model": "granite-ft",
+  "model_sha256": "884ae0f494dc05af2861dac76d5425524d8ca32aab4f8490ca932bdb07856d84",
+  "model_pick": "granite c3 (mean of 3 seeds)",
+  "calibration_records": 503,
+  "calibration_data": "cross-fitted dev-project scores from the run-3 notebook (train only)",
+  "train_coverage": 0.6351888667992047,
+  "train_balanced_accuracy_decided": 0.7556868277199789,
+  "v1_thresholds_version": "calibrated-train-minilm-ft-2026-10-23",
+  "thresholds": {
+    "version": "v2-tfidf-granite-train-2026-10-27",
+    "eps": 0.1507,
+    "scale_tfidf": 0.09079770216729176,
+    "scale_encoder": 0.035941802431723735,
+    "encoder": "granite-ft",
+    "min_doc_words": 5,
+    "snapshot_low": null,
+    "snapshot_high": null
+  }
+}

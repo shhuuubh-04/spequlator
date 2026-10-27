@@ -10,14 +10,13 @@ const EMPTY: Record<Field, string> = { documentation: "", code: "", old_code: ""
 function Status({ health, down }: { health: Health | null; down: boolean }) {
   if (down) return <p className="status bad">Analysis service offline</p>;
   if (!health) return <p className="status">Connecting…</p>;
-  const enc = { ready: "encoder ready", loading: "encoder loading…", unavailable: "encoder unavailable", disabled: "encoder off" }[
+  const model = health.encoder_name?.split(" (")[0] || "encoder";
+  const enc = { ready: `${model} ready`, loading: `${model} loading…`, unavailable: `${model} unavailable`, disabled: "encoder off" }[
     health.encoder
   ];
-  const cross = health.cross === "ready" ? ", cross-encoder ready" : health.cross === "loading" ? ", cross-encoder loading…" : "";
   return (
     <p className={`status ${health.tfidf ? "" : "bad"}`} title={health.encoder_name ?? ""}>
       {health.tfidf ? "TF-IDF ready" : "TF-IDF model missing"}, {enc}
-      {cross}
     </p>
   );
 }
@@ -78,16 +77,16 @@ export default function App() {
     values.new_code === example.new_code &&
     values.documentation === (docVersion === "old" ? example.old_doc : example.new_doc);
 
-  const request = (crossWords: boolean) =>
+  const request = (words: boolean) =>
     untouchedExample
-      ? api.explainExample(example!.record_id, docVersion, crossWords)
+      ? api.explainExample(example!.record_id, docVersion, words)
       : api.explain(
           mode === "snapshot"
             ? { documentation: values.documentation, code: values.code }
-            : { documentation: values.documentation, old_code: values.old_code, new_code: values.new_code, cross_words: crossWords },
+            : { documentation: values.documentation, old_code: values.old_code, new_code: values.new_code, words },
         );
 
-  // The word heatmap costs one model pass per word, so it is fetched only when asked for.
+  // The word heatmap costs one encoder pass per word, so it is fetched only when asked for.
   const explainWords = async () => {
     setWordsBusy(true);
     try {

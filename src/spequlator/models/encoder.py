@@ -2,6 +2,7 @@
 
 - UniXcoder: pretrained deep-learning signal (D-018). Apache-2.0, no remote code.
 - MiniLM: base for the fine-tuned encoder (D-020); "minilm-ft" loads artifacts/minilm-ft.
+- Granite Small R2 fine-tuned in phase 2 run 3: "granite-ft" loads artifacts/granite-ft (D-034).
 - ``trust_remote_code`` is never enabled (D-018; Jina failed to load on transformers 5.x, F7).
 - Any load/run failure raises EncoderUnavailable so analysis can continue (D-019).
 """
@@ -61,10 +62,21 @@ def spec_for(key: str) -> EncoderSpec:
             128,
             label="minilm-ft (all-MiniLM-L6-v2@1110a24 fine-tuned on CoDocBench train, D-020)",
         )
-    raise ValueError(f"unknown encoder {key!r}; choose unixcoder, minilm or minilm-ft")
+    if key == "granite-ft":
+        return EncoderSpec(
+            "granite-ft",
+            str(artifacts_dir() / "granite-ft"),
+            None,
+            256,  # as trained and tested in phase 2 run 3
+            label=(
+                "granite-ft (granite-embedding-small-english-r2@2ab6fa8 fine-tuned on "
+                "CoDocBench train, D-034)"
+            ),
+        )
+    raise ValueError(f"unknown encoder {key!r}; choose unixcoder, minilm, minilm-ft or granite-ft")
 
 
-ENCODER_KEYS = ("unixcoder", "minilm", "minilm-ft")
+ENCODER_KEYS = ("unixcoder", "minilm", "minilm-ft", "granite-ft")
 
 
 class SentenceEncoder:

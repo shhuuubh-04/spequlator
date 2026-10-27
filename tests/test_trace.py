@@ -173,3 +173,36 @@ def test_float32_encoder_output_does_not_break_the_trace(small_tfidf):
     ex = explain(_change(), tfidf=small_tfidf, encoder=Float32Encoder(), thresholds=CAL)
     assert ex.trace.encoder.status == "ok"
     assert ex.trace.encoder.delta == pytest.approx(ex.report.signals.encoder.value, abs=1e-5)
+
+
+class WordEncoder:
+    """Bag-of-words vectors: one dimension per vocabulary word, so occlusion is checkable."""
+
+    name = "bag-of-words test encoder"
+    VOCAB = ("timeout", "retries", "session", "users", "fetch")
+
+    def encode(self, texts):
+        v = np.array([[t.lower().count(w) + 0.01 for w in self.VOCAB] for t in texts], dtype=float)
+        return v / np.linalg.norm(v, axis=1, keepdims=True), [False] * len(texts)
+
+
+def test_word_importance_only_when_asked(small_tfidf):
+    plain = explain(_change(), tfidf=small_tfidf, encoder=WordEncoder(), thresholds=CAL)
+    assert plain.trace.words is None
+    ex = explain(_change(), tfidf=small_tfidf, encoder=WordEncoder(), thresholds=CAL, words=True)
+    w = ex.trace.words
+    assert w is not None and w.delta == pytest.approx(ex.report.signals.encoder.value, abs=1e-6)
+    assert w.n_words == len(w.words) and w.passes == w.n_words + 1
+    doc = _change().documentation
+    by_word = {}
+    for x in w.words:
+        by_word.setdefault(doc[x.start : x.end].strip(".:"), []).append(x.weight)
+    assert "timeout" in w.toward_stale  # the renamed-away parameter pulls toward the old code
+    assert all(abs(v) < 1e-9 for v in by_word["active"])  # not in the toy vocabulary: no effect
+
+
+def test_word_importance_needs_an_encoder_and_change_mode(small_tfidf):
+    assert explain(_change(), tfidf=small_tfidf, thresholds=CAL, words=True).trace.words is None
+    snap = AnalysisInput(documentation=read("aligned", "doc.txt"), code=read("aligned", "code.py"))
+    tr = explain(snap, tfidf=small_tfidf, encoder=WordEncoder(), thresholds=CAL, words=True).trace
+    assert tr.words is None

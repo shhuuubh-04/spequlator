@@ -7,6 +7,7 @@ Findings are reviewer-facing heuristic states, never ground truth (D-003, D-007)
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -15,6 +16,7 @@ from spequlator.paths import artifacts_dir
 from spequlator.schemas import Finding, Mode
 
 THRESHOLDS_NAME = "thresholds.json"
+THRESHOLDS_V2_NAME = "thresholds_v2.json"  # v2: TF-IDF + Granite (D-034)
 
 
 @dataclass(frozen=True)
@@ -41,6 +43,18 @@ class Thresholds:
         if encoder is not None:
             parts.append(encoder / self.scale_encoder)
         return sum(parts) / len(parts)
+
+    @classmethod
+    def active(cls) -> Thresholds:
+        """Settings the app and CLI analyse with: v2 (TF-IDF + Granite, D-034) once promoted.
+
+        Falls back to the frozen v1 settings when artifacts/thresholds_v2.json is absent or
+        SPEQULATOR_SYSTEM=v1. Evaluation code always uses load(), i.e. v1.
+        """
+        v2 = artifacts_dir() / THRESHOLDS_V2_NAME
+        if os.environ.get("SPEQULATOR_SYSTEM", "").strip().lower() != "v1" and v2.exists():
+            return cls.load(v2)
+        return cls.load()
 
     @classmethod
     def load(cls, path: Path | None = None) -> Thresholds:

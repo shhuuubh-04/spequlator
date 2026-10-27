@@ -209,23 +209,20 @@ class Constants(BaseModel):
     encoder_key: str | None
 
 
-class CrossWord(BaseModel):
+class WordWeight(BaseModel):
     start: int
     end: int
-    weight: float  # score with the word minus score without it; > 0 = pushed toward "fits"
+    weight: float  # Δ with the word minus Δ without it; > 0 = pushed toward "fits the new code"
 
 
-class CrossStep(BaseModel):
-    """Phase-2 cross-encoder second opinion (D-032). Shown beside v1; not part of the decision."""
+class WordsStep(BaseModel):
+    """Which docstring words moved the encoder's meaning score (occlusion, on request)."""
 
     model: str
-    input_format: str
-    max_len: int
-    score: float  # logit: > 0 leans "fits the new code", < 0 leans "stale"; not a probability
-    lean: Literal["fits", "stale"]
-    words: list[CrossWord]
+    delta: float  # the encoder Δ for the full docstring (same as the report's signal)
+    words: list[WordWeight]
     n_words: int
-    passes: int
+    passes: int  # encoder passes over docstring variants (code embeddings are reused)
     toward_stale: list[str]
     toward_fits: list[str]
 
@@ -247,7 +244,7 @@ class Trace(BaseModel):
     decision: DecisionStep
     text: TextStep
     constants: Constants
-    cross: CrossStep | None = None
+    words: WordsStep | None = None
 
 
 class Explained(BaseModel):
@@ -677,12 +674,11 @@ def explain(
     tfidf: TfidfModel | None = None,
     encoder: Encoder | None = None,
     thresholds: Thresholds | None = None,
-    cross: object | None = None,
-    cross_words: bool = False,
+    words: bool = False,
 ) -> Explained:
     """``analyze()`` plus a step-by-step trace whose numbers are checked against the report.
 
-    ``cross`` is the optional phase-2 cross-encoder; its result is a separate second opinion.
+    ``words=True`` adds the word-importance step (one encoder pass per docstring word).
     """
     model = tfidf or tfidf_mod.load()
     th = thresholds or Thresholds.load()
@@ -749,37 +745,40 @@ def explain(
             encoder_key=th.encoder,
         ),
     )
-    if cross is not None and change:
-        trace.cross = _cross_step(cross, inp, cross_words)
+    if words and change and report.signals.encoder is not None and encoder is not None:
+        trace.words = _words_step(encoder, inp, report.signals.encoder.model)
     return Explained(report=report, trace=trace)
 
 
-def _cross_step(model, inp: AnalysisInput, with_words: bool) -> CrossStep | None:
-    from spequlator.models.base import EncoderUnavailable
-    from spequlator.models.cross_encoder import score, word_importance
+_DOC_WORD = re.compile(r"\S+")  # whitespace-separated words, as a reader sees them
+MAX_WORDS = 80
 
-    try:
-        if with_words:
-            base, weights, n = word_importance(model, inp.documentation, inp.old_code, inp.new_code)
-        else:
-            base, weights, n = score(model, inp.documentation, inp.old_code, inp.new_code), [], 0
-    except EncoderUnavailable:
-        return None
-    doc = inp.documentation
+
+def _words_step(encoder: Encoder, inp: AnalysisInput, model: str) -> WordsStep:
+    """Occlusion on the encoder Δ: drop each word, re-encode the docstring, compare Δ."""
+    doc, new, old = inp.documentation, inp.new_code or "", inp.old_code or ""
+    found = list(_DOC_WORD.finditer(doc))[:MAX_WORDS]
+    variants = [doc] + [doc[: m.start()] + doc[m.end() :] for m in found]
+    emb, _ = encoder.encode([*variants, new, old])
+    emb = np.asarray(emb, dtype=float)
+    d, n, o = emb[:-2], emb[-2], emb[-1]
+    delta = d @ n - d @ o
+    base = float(delta[0])
+    weights = [
+        WordWeight(start=m.start(), end=m.end(), weight=base - float(x))
+        for m, x in zip(found, delta[1:], strict=True)
+    ]
     ranked = sorted(weights, key=lambda w: w.weight)
 
-    def words(ws):
+    def names(ws: list[WordWeight]) -> list[str]:
         return list(dict.fromkeys(doc[w.start : w.end].strip(".,:;()`'\"") for w in ws))[:5]
 
-    return CrossStep(
-        model=model.name,
-        input_format=model.fmt,
-        max_len=getattr(model, "max_len", 512),
-        score=base,
-        lean="fits" if base >= 0 else "stale",
-        words=[CrossWord(start=w.start, end=w.end, weight=w.weight) for w in weights],
-        n_words=n,
-        passes=n + 1,
-        toward_stale=words([w for w in ranked if w.weight < 0]),
-        toward_fits=words([w for w in reversed(ranked) if w.weight > 0]),
+    return WordsStep(
+        model=model,
+        delta=base,
+        words=weights,
+        n_words=len(found),
+        passes=len(variants),
+        toward_stale=names([w for w in ranked if w.weight < 0]),
+        toward_fits=names([w for w in reversed(ranked) if w.weight > 0]),
     )
