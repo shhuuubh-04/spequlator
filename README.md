@@ -72,6 +72,8 @@ The test split was opened once, after freezing every setting (tag `frozen-eval`)
 - Rule R1 fires 4.3x more often on stale docstrings and names the exact parameter; R2 is weaker (1.9x) and only decides close calls.
 - The manual review of 60 reports was **scored by an LLM, not a human** (D-029); see the evaluation doc for what it found.
 
+**Phase 2 and v2** ([`docs/PHASE2_RESULTS.md`](docs/PHASE2_RESULTS.md)): three pre-registered GPU training runs on the train split. A fine-tuned code-aware encoder, Granite Embedding Small R2, beats fine-tuned MiniLM (test pooled AUC +0.021 [0.012, 0.030]). TF-IDF + Granite reaches 0.734, against 0.706 for TF-IDF and for v1. The app now runs this combination (v2, D-034); `SPEQULATOR_SYSTEM=v1` runs the frozen v1 system.
+
 ## Limitations
 
 - R1 only checks one direction: a newly added parameter that the docstring never mentions is not flagged.
